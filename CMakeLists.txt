@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.22)
+
+project(
+    CppDatabase
+    VERSION 0.1
+)
+
+
+add_executable(
+    CppDatabase
+    main.cpp
+)
+target_compile_options(CppDatabase PUBLIC -Wall -Werror -std=c++20)
+
+add_subdirectory(tests)
+add_subdirectory(db_stream)
+add_subdirectory(schema)
+add_subdirectory(memory)
+target_link_libraries(CppDatabase PUBLIC db_stream)
+target_link_libraries(CppDatabase PUBLIC schema)
