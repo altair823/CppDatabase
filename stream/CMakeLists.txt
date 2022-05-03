@@ -1,22 +1,20 @@
 add_library(
-        type
-        field_type.cc
-        f_datetime.cc
-        f_string.cc
-        f_date.cc)
+        stream
+        db_fstream.cc
+)
 
 target_include_directories(
-        type
+        stream
         PUBLIC
-        ${PROJECT_SOURCE_DIR}/includes/type
+        ${PROJECT_SOURCE_DIR}/includes/stream
 )
 target_compile_options(
-        type
+        stream
         PRIVATE
         #-Wall -Werror
         -std=c++20)
 target_link_libraries(
-        type
+        stream
         PUBLIC
         memory
 )

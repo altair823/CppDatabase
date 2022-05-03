@@ -11,22 +11,20 @@
 #include <ostream>
 #include <iostream>
 
-class String : public FieldType{
-public:
-    String();
-    std::unique_ptr<unsigned char[]> serialize() override;
-    void deserialize(std::unique_ptr<unsigned char[]>&) override;
+class String : public FieldType {
+ public:
+  std::string str;
 
-    friend std::ostream &operator<<(std::ostream &os, const String &string);
+  String();
+  std::unique_ptr<unsigned char[]> serialize() override;
+  void deserialize(std::unique_ptr<unsigned char[]> &) override;
 
-    bool operator==(const String &rhs) const;
+  bool operator==(const String &rhs) const;
 
-    std::string str;
-
-private:
-    static int get_byte_count(int size);
-    static int write_str_size_bits(std::unique_ptr<unsigned char[]>& binary, int size, int byte_count);
+ private:
+  static int get_byte_count(int size);
+  static int write_str_size_bits(std::unique_ptr<unsigned char[]> &binary, int size, int byte_count);
+  std::ostream& out(std::ostream& os) const override;
 };
-
 
 #endif //CPPDATABASE_F_STRING_H
