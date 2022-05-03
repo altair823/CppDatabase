@@ -3,7 +3,7 @@
 //
 #include <mem_core.h>
 
-void set_field_type(unsigned char& dest, Schema& field_type) {
+void set_field_type(unsigned char& dest, Type& field_type) {
     auto type = static_cast<unsigned char>(field_type);
     if (type < 16) {
         std::bitset<4> t(type);
@@ -17,12 +17,12 @@ void set_field_type(unsigned char& dest, Schema& field_type) {
     }
 }
 
-bool set_mem(unsigned char& dest, unsigned char& value, Location_in_byte loc){
+bool set_mem(unsigned char& dest, const unsigned char& value, Location_in_byte loc){
     if (value > 15){
         return false;
     }
     auto v = std::bitset<4>(value);
-    if (loc){
+    if (loc == Location_in_byte::First){
         for (char i = 0; i < 4; i++){
             dest |= v[i] << i + 4;
         }
@@ -34,11 +34,11 @@ bool set_mem(unsigned char& dest, unsigned char& value, Location_in_byte loc){
     return true;
 }
 
-void set_mem(unsigned char& dest, unsigned char& value){
+void set_mem(unsigned char& dest, const unsigned char& value){
     dest = value;
 }
 
-void set_mem(unsigned char& dest1, unsigned char& dest2, unsigned char& value){
+void set_mem(unsigned char& dest1, unsigned char& dest2, const unsigned char& value){
     std::bitset<8> y(value);
     for (int i = 0; i < 4; i++){
         dest1 |= y[i+4] << i;
@@ -46,8 +46,8 @@ void set_mem(unsigned char& dest1, unsigned char& dest2, unsigned char& value){
     }
 }
 
-void read_mem(unsigned char &origin, unsigned char &value, Location_in_byte loc) {
-    if (loc == First){
+void read_mem(const unsigned char &origin, unsigned char &value, Location_in_byte loc) {
+    if (loc == Location_in_byte::First){
         for (int i = 0; i < 4; i++){
             auto b = (origin >> (i + 4)) & 1;
             value |= b << i;
@@ -60,11 +60,11 @@ void read_mem(unsigned char &origin, unsigned char &value, Location_in_byte loc)
     }
 }
 
-void read_mem(unsigned char &origin, unsigned char &value) {
+void read_mem(const unsigned char &origin, unsigned char &value) {
     value = origin;
 }
 
-void read_mem(unsigned char &origin1, unsigned char &origin2, unsigned char &value) {
+void read_mem(const unsigned char &origin1, const unsigned char &origin2, unsigned char &value) {
     for (int i = 0; i < 4; i++){
         auto b = (origin1 >> i) & 1;
         value |= b << (i + 4);

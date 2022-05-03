@@ -13,8 +13,6 @@ add_executable(
 target_compile_options(CppDatabase PUBLIC -Wall -Werror -std=c++20)
 
 add_subdirectory(tests)
-add_subdirectory(db_stream)
-add_subdirectory(schema)
+add_subdirectory(type)
 add_subdirectory(memory)
-target_link_libraries(CppDatabase PUBLIC db_stream)
-target_link_libraries(CppDatabase PUBLIC schema)
+target_link_libraries(CppDatabase PUBLIC type)

@@ -1,5 +1,5 @@
 #include <f_datetime.h>
-#include "schema.h"
+#include <field_type.h>
 #include <iostream>
 
 void print_bits(std::unique_ptr<unsigned char[]> &data, size_t length){
@@ -11,7 +11,7 @@ void print_bits(std::unique_ptr<unsigned char[]> &data, size_t length){
 }
 
 int main (){
-    DateTime d(Schema::CreatedDate);
+    DateTime d;
     d.f_year = 30;
     d.f_month = 10;
     d.f_day = 30;
@@ -32,7 +32,9 @@ int main (){
     std::cout<<d<<std::endl;
 
     auto c = DateTime();
-    c.deserialization(a);
+    c.deserialize(a);
     std::cout<<c<<std::endl;
+
+
 }
 

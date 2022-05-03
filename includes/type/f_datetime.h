@@ -6,7 +6,6 @@
 #define CPPDATABASE_F_DATETIME_H
 
 
-#include <memory>
 #include <bitset>
 #include <mem_core.h>
 #include <field_type.h>
@@ -24,9 +23,11 @@ public:
     unsigned char f_sec; // 8
 
     DateTime();
-    explicit DateTime(Schema field_type);
+
+    bool operator==(const DateTime &rhs) const;
+
     std::unique_ptr<unsigned char[]> serialize() override;
-    void deserialization(std::unique_ptr<unsigned char[]>&) override;
+    void deserialize(std::unique_ptr<unsigned char[]>&) override;
 
     friend std::ostream &operator<<(std::ostream &os, const DateTime &time);
 

@@ -15,14 +15,23 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(
-  test
-  db_stream_test.cc
+        test
+        test_util.cc
+        f_datetime_test.cc
+        f_string_test.cc
 )
 target_link_libraries(
   test
   gtest_main
-  db_stream
+        type
+)
+target_include_directories(
+        test
+        PUBLIC
+        ${PROJECT_SOURCE_DIR}/includes/test
 )
 
 include(GoogleTest)
 gtest_discover_tests(test)
+
+target_compile_options(test PRIVATE -Wall -Werror -std=c++20)
