@@ -1,9 +1,10 @@
 add_library(
         type
-        field_type.cc
+        field_data.cc
         f_datetime.cc
         f_string.cc
-        f_date.cc)
+        f_date.cc
+)
 
 target_include_directories(
         type

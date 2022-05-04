@@ -1,5 +1,5 @@
 #include <f_datetime.h>
-#include <field_type.h>
+#include <field_data.h>
 #include <iostream>
 
 void print_bits(std::unique_ptr<unsigned char[]> &data, size_t length) {
@@ -32,7 +32,7 @@ int main() {
   std::cout << d << std::endl;
 
   auto c = DateTime();
-  c.deserialize(a);
+  c.deserialize(a, 0);
   std::cout << c << std::endl;
 
 }

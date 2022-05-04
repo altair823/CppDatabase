@@ -6,7 +6,7 @@
 #define CPPDATABASE_DATACORE_H
 
 #include <bitset>
-#include <type/field_type.h>
+#include <type/field_data.h>
 
 enum class Location_in_byte {
   First,

@@ -6,7 +6,8 @@
 #define CPPDATABASE_TEST_UTIL_H
 
 #include <iostream>
+#include <field_data.h>
 
-void print_bits(std::unique_ptr<unsigned char[]> &data, size_t length);
+void print_bits(BinaryRef binary);
 
 #endif //CPPDATABASE_TEST_UTIL_H

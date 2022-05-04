@@ -3,7 +3,7 @@
 //
 
 #include <gtest/gtest.h>
-#include <field_type.h>
+#include <field_data.h>
 #include <mem_core.h>
 #include <f_string.h>
 #include <test_util.h>
@@ -16,7 +16,7 @@ int get_byte_count(int size) {
   }
   return i;
 }
-TEST(f_string_test, string_bit_test) {
+TEST(StringTest, StringBitTest) {
   std::string str =
       "달아 달아 밝은 달아 이태백이 놀던 달아 저기 저기 저달 속에 계수 나무 박혔으니 옥도끼로 찍어내어 금도끼로 다듬어서 초가삼간 집을 짓고 양친 부모 모셔다가 천년 만년 살고지고 천년 만년 살고지고";
   auto v = std::vector<unsigned char>();
@@ -43,7 +43,7 @@ TEST(f_string_test, string_bit_test) {
   ASSERT_EQ(size_bit_count, 2);
 }
 
-TEST(f_string_test, SerializeTest) {
+TEST(StringTest, SerializeTest) {
   String a;
   a.str =
       "달아 달아 밝은 달아 이태백이 놀던 달아 저기 저기 저달 속에 계수 나무 박혔으니 옥도끼로 찍어내어 금도끼로 다듬어서 초가삼간 집을 짓고 양친 부모 모셔다가 천년 만년 살고지고 천년 만년 살고지고";
@@ -55,7 +55,7 @@ TEST(f_string_test, SerializeTest) {
   //print_bits(b, 272);
 
   String t;
-  t.deserialize(b);
+  t.deserialize(b, 0);
   //std::cout<<t<<std::endl;
 
   ASSERT_EQ(a, t);

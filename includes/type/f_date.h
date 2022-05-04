@@ -5,9 +5,9 @@
 #ifndef CPPDATABASE_INCLUDES_TYPE_F_DATE_H_
 #define CPPDATABASE_INCLUDES_TYPE_F_DATE_H_
 
-#include <field_type.h>
+#include <field_data.h>
 
-class Date: public FieldType{
+class Date: public FieldData{
 
 };
 

@@ -4,15 +4,17 @@
 
 #include <f_string.h>
 
-String::String() : FieldType(Type::STRING) {}
+#include <utility>
 
-std::unique_ptr<unsigned char[]> String::serialize() {
+String::String() : FieldData(Type::STRING) {}
+
+Binary String::serialize() {
   auto binary = std::make_unique<unsigned char[]>(str.size() + 2);
   set_mem(binary[0], type_to_4_bits(Type::STRING), Location_in_byte::First);
   int str_bits = (int) str.size();
   auto bit_count = get_byte_count(str_bits);
   if (bit_count > 15) {
-    return nullptr;
+    return {nullptr, 0};
   }
   set_mem(binary[0], bit_count, Location_in_byte::Second);
 
@@ -23,25 +25,30 @@ std::unique_ptr<unsigned char[]> String::serialize() {
     b_index++;
   }
 
-  return binary;
+  return {std::move(binary), b_index};
 }
 
-void String::deserialize(std::unique_ptr<unsigned char[]> &binary) {
+Result<int> String::deserialize(Binary &binary, int begin) {
   unsigned char type = 0;
-  read_mem(binary[0], type, Location_in_byte::First);
+  read_mem(binary.data[begin], type, Location_in_byte::First);
   unsigned char size_char_count = 0;
-  read_mem(binary[0], size_char_count, Location_in_byte::Second);
+  read_mem(binary.data[begin], size_char_count, Location_in_byte::Second);
   int size = 0;
-  int index = 1;
+  int index = begin + 1;
   for (int i = 0; i < size_char_count; i++) {
-    size += binary[index] << 8 * (size_char_count - (i + 1));
+    size += binary.data[index] << 8 * (size_char_count - (i + 1));
     index++;
+  }
+
+  if (size > binary.length - 1 - size_char_count){
+    return Err(0, "Binary size error!");
   }
 
   for (int i = 0; i < size; i++) {
-    str.push_back((char) binary[index]);
+    str.push_back((char) binary.data[index]);
     index++;
   }
+  return Ok(index);
 }
 
 int String::get_byte_count(int size) {
@@ -68,11 +75,20 @@ std::ostream &operator<<(std::ostream &os, const String &string) {
   return os;
 }
 
-bool String::operator==(const String &rhs) const {
-  return this->field_type == rhs.field_type && str == rhs.str;
-}
 std::ostream &String::out(std::ostream &os) const {
   os << "field_type: " << this->field_type << " str: " << this->str;
   return os;
+}
+bool String::eq(const FieldData &rhs) const {
+  auto rh = dynamic_cast<const String&>(rhs);
+  return this->field_type == rh.field_type && str == rh.str;
+}
+
+String::String(std::string str): FieldData(Type::STRING), str(std::move(str)) {}
+
+int String::get_total_byte_size() const {
+  int str_size = (int)str.size();
+  auto size_byte_count = get_byte_count(str_size);
+  return str_size + size_byte_count + 1;
 }
 

@@ -7,26 +7,28 @@
 
 #include <bitset>
 #include <mem_core.h>
-#include <field_type.h>
+#include <field_data.h>
 #include <ostream>
 #include <iostream>
 
-class DateTime : public FieldType {
+class DateTime : public FieldData {
  public:
   unsigned char f_year; // 8bits
   unsigned char f_month; // 4
   unsigned char f_day; // 8
   unsigned char f_hour; // 8
   unsigned char f_min; // 8
+  int get_total_byte_size() const override;
   unsigned char f_sec; // 8
 
   DateTime();
+  DateTime(int year, char month, char day, char hour, char min, char sec);
 
-  std::unique_ptr<unsigned char[]> serialize() override;
-  void deserialize(std::unique_ptr<unsigned char[]> &) override;
+  Binary serialize() override;
+  Result<int> deserialize(Binary &binary, int begin) override;
 
-  bool operator==(const DateTime &rhs) const;
  private:
+  bool eq(const FieldData &rhs) const override;
   std::ostream& out(std::ostream& os) const override;
 };
 
