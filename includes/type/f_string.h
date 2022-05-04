@@ -18,7 +18,7 @@ class String : public FieldData {
   String();
   explicit String(std::string str);
   Binary serialize() override;
-  Result<int> deserialize(Binary &binary, int begin) override;
+  Result<int> deserialize(BinaryRef binary, int begin) override;
   int get_total_byte_size() const override;
 
  private:

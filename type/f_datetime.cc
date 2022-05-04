@@ -28,7 +28,7 @@ DateTime::DateTime(int year, char month, char day, char hour, char min, char sec
   }
 }
 
-Result<int> DateTime::deserialize(Binary &binary, int begin) {
+Result<int> DateTime::deserialize(BinaryRef binary, int begin) {
   unsigned char a = 0;
   read_mem(binary.data[begin], a, Location_in_byte::First);
   this->field_type = bits_to_type(a);

@@ -61,7 +61,7 @@ class FieldData {
   virtual ~FieldData() = default;
   explicit FieldData(Type field_type);
   virtual Binary serialize() = 0;
-  virtual Result<int> deserialize(Binary &binary, int begin) = 0;
+  virtual Result<int> deserialize(BinaryRef binary, int begin) = 0;
   virtual int get_total_byte_size() const = 0;
 
   bool operator==(const FieldData &rhs) const;
@@ -74,5 +74,7 @@ class FieldData {
 };
 
 typedef std::shared_ptr<FieldData> FieldDataShared;
+
+
 
 #endif //CPPDATABASE_FIELD_INTERFACE_H

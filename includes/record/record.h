@@ -2,8 +2,8 @@
 // Created by 김태현 on 2022/05/04.
 //
 
-#ifndef CPPDATABASE_INCLUDES_SCHEMA_SCHEMA_H_
-#define CPPDATABASE_INCLUDES_SCHEMA_SCHEMA_H_
+#ifndef CPPDATABASE_INCLUDES_SCHEMA_RECORD_H_
+#define CPPDATABASE_INCLUDES_SCHEMA_RECORD_H_
 
 #include <utility>
 #include <vector>
@@ -26,24 +26,25 @@ struct Field{
 
 typedef std::shared_ptr<Field> FieldShared;
 
-class Schema{
+class Record{
  public:
-  Schema();
+  Record();
 
   Result<bool> set_field(std::shared_ptr<FieldData> data, const std::string& field_name);
   Result<FieldShared> get_field(const std::string& field_name) const;
-  int get_total_byte_size() const;
 
-  friend std::ostream &operator<<(std::ostream &os, const Schema &schema);
-  bool operator==(const Schema &rhs) const;
+  Binary serialize();
+
+  int get_total_byte_size() const;
+  friend std::ostream &operator<<(std::ostream &os, const Record &schema);
+  bool operator==(const Record &rhs) const;
 
   std::vector<Field> fields;
 };
 
-typedef std::unique_ptr<Schema> SchemaUnique;
+typedef std::unique_ptr<Record> RecordUnique;
 
 Result<FieldDataShared> type_to_field(Type type);
-Binary serialize(Schema& schema);
-SchemaUnique deserialize(BinaryRef binary, std::vector<std::string> &field_names);
+RecordUnique deserialize(BinaryRef binary, std::vector<std::string> &field_names);
 
-#endif //CPPDATABASE_INCLUDES_SCHEMA_SCHEMA_H_
+#endif //CPPDATABASE_INCLUDES_SCHEMA_RECORD_H_

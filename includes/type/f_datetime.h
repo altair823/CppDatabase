@@ -25,7 +25,7 @@ class DateTime : public FieldData {
   DateTime(int year, char month, char day, char hour, char min, char sec);
 
   Binary serialize() override;
-  Result<int> deserialize(Binary &binary, int begin) override;
+  Result<int> deserialize(BinaryRef binary, int begin) override;
 
  private:
   bool eq(const FieldData &rhs) const override;

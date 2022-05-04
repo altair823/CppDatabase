@@ -28,7 +28,7 @@ Binary String::serialize() {
   return {std::move(binary), b_index};
 }
 
-Result<int> String::deserialize(Binary &binary, int begin) {
+Result<int> String::deserialize(BinaryRef binary, int begin) {
   unsigned char type = 0;
   read_mem(binary.data[begin], type, Location_in_byte::First);
   unsigned char size_char_count = 0;

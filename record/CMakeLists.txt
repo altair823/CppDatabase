@@ -1,20 +1,20 @@
 add_library(
-        schema
-        schema.cc
+        record
+        record.cc
 )
 
 target_include_directories(
-        schema
+        record
         PUBLIC
-        ${PROJECT_SOURCE_DIR}/includes/schema
+        ${PROJECT_SOURCE_DIR}/includes/record
 )
 target_compile_options(
-        schema
+        record
         PRIVATE
         #-Wall -Werror
         -std=c++20)
 target_link_libraries(
-        schema
+        record
         PUBLIC
         type
 )

@@ -19,12 +19,12 @@ add_executable(
         test_util.cc
         f_datetime_test.cc
         f_string_test.cc
-        schema_test.cc)
+        record_test.cc)
 target_link_libraries(
         test
         gtest_main
         type
-        schema
+        record
 )
 target_include_directories(
         test
