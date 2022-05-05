@@ -7,20 +7,8 @@
 
 #include <memory>
 #include <ostream>
-
-#define _Ok true
-#define Ok(ok) Result{_Ok, ok}
-#define _Err false
-#define Err(e, err) Result{_Err, e, err}
-
-template<typename T>
-struct Result{
-  Result(bool is_ok, T ok, const std::string& err = ""): ok(ok), is_ok(is_ok){}
-  bool is_ok = false;
-  T ok;
-  std::string err;
-};
-
+#include <utility>
+#include <result.h>
 
 /**
  * Type of fields in DB schema.
@@ -38,8 +26,8 @@ enum class Type {
   BIGINT, // 8
   FLOAT, // 9
   DOUBLE, // 10
-  BIT,
-  BLOB,
+  BIT, // 11
+  BLOB, // 12
 };
 
 struct Binary{

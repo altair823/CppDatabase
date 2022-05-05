@@ -44,7 +44,7 @@ bool Record::operator==(const Record &rhs) const {
     if (!rhs.get_field(f.name).is_ok){
       return false;
     }
-    if (*f.data != *rhs.get_field(f.name).ok->data){
+    if (*f.data != *rhs.get_field(f.name).unwrap()->data){
       return false;
     }
   }
@@ -99,8 +99,8 @@ RecordUnique deserialize(BinaryRef binary, std::vector<std::string> &field_names
   for (int index = 0; index < binary.length && name_index < field_names.size(); ){
     unsigned char type = 0;
     read_mem(binary.data[index], type, Location_in_byte::First);
-    auto field = type_to_field(bits_to_type(type)).ok;
-    auto index_before = field->deserialize(binary, index).ok;
+    auto field = type_to_field(bits_to_type(type)).unwrap();
+    auto index_before = field->deserialize(binary, index).unwrap();
     index = index_before;
     schema->set_field(field, field_names[name_index++]);
   }

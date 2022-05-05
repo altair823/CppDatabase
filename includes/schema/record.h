@@ -31,11 +31,11 @@ class Record{
   Record();
 
   Result<bool> set_field(std::shared_ptr<FieldData> data, const std::string& field_name);
-  Result<FieldShared> get_field(const std::string& field_name) const;
+  [[nodiscard]] Result<FieldShared> get_field(const std::string& field_name) const;
 
   Binary serialize();
 
-  int get_total_byte_size() const;
+  [[nodiscard]] int get_total_byte_size() const;
   friend std::ostream &operator<<(std::ostream &os, const Record &schema);
   bool operator==(const Record &rhs) const;
 

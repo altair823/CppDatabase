@@ -33,8 +33,8 @@ TEST(RecordTest, GetFieldTest){
   record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date");
   record.set_field(std::make_shared<String>("this is string type variable. 이것은 문자열 타입 변수입니다."), "File name");
 
-  auto f1 = record.get_field("Created date").ok->data;
-  auto f2 = record.get_field("File name").ok->data;
+  auto f1 = record.get_field("Created date").unwrap()->data;
+  auto f2 = record.get_field("File name").unwrap()->data;
 
   //std::cout<<*f1<<std::endl<<*f2<<std::endl;
 
