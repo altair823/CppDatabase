@@ -46,6 +46,7 @@ std::ostream &operator<<(std::ostream &os, const Type &type);
 class FieldData {
  public:
   FieldData();
+  FieldData(const FieldData& field_data);
   virtual ~FieldData() = default;
   explicit FieldData(Type field_type);
   virtual Binary serialize() = 0;

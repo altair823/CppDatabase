@@ -21,7 +21,7 @@ struct Result{
   std::string err;
   int line_num;
 
-  T unwrap() { if (is_ok) {return _ok;} else { std::cout << "panic!\n" + err + "\nLine: " << line_num << std::endl; exit(1);} }
+  T unwrap() { if (is_ok) {return std::move(_ok);} else { std::cout << "panic!\n" + err + "\nLine: " << line_num << std::endl; exit(1);} }
 };
 
 #endif //CPPDATABASE_INCLUDES_RESULT_H_

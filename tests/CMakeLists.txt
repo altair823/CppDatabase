@@ -19,7 +19,7 @@ add_executable(
         test_util.cc
         f_datetime_test.cc
         f_string_test.cc
-        record_test.cc schema_test.cc table_test.cpp)
+        record_test.cc schema_test.cc table_test.cpp db_stream_test.cc)
 target_link_libraries(
         test
         gtest_main
@@ -31,6 +31,7 @@ target_include_directories(
         PUBLIC
         ${PROJECT_SOURCE_DIR}/includes/test
 )
+
 
 include(GoogleTest)
 gtest_discover_tests(test)

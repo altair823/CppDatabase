@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <table.h>
-#include <b_tree.h>
+#include "storage/b_tree/bp_tree.h"
 
 TEST(TableTest, InsertTest){
   SchemaBuilder builder("test_schema");

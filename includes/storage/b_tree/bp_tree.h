@@ -2,10 +2,10 @@
 // Created by 김태현 on 2022/05/05.
 //
 
-#ifndef CPPDATABASE_INCLUDES_STORAGE_B_TREE_H_
-#define CPPDATABASE_INCLUDES_STORAGE_B_TREE_H_
+#ifndef CPPDATABASE_INCLUDES_STORAGE_BP_TREE_H_
+#define CPPDATABASE_INCLUDES_STORAGE_BP_TREE_H_
 
-#include <storage_interface.h>
+#include "storage/storage_interface.h"
 
 template <typename Key, typename Value>
 class BTree: public Storage<Key, Value>{
@@ -25,4 +25,4 @@ class BTree: public Storage<Key, Value>{
   }
 };
 
-#endif //CPPDATABASE_INCLUDES_STORAGE_B_TREE_H_
+#endif //CPPDATABASE_INCLUDES_STORAGE_BP_TREE_H_
