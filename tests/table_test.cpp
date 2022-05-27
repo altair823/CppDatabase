@@ -13,7 +13,7 @@ TEST(TableTest, InsertTest){
       ->set_field(Type::DATETIME, "datetime1", KeyType::FK).unwrap()
       ->set_field(Type::DATETIME, "datetime2").unwrap()->build().unwrap();
 
-  BPTree<FieldDataShared, RecordUnique> storage;
+  BPTree<FieldDataShared, RecordUnique> storage("test_db_file");
   Table<FieldDataShared, RecordUnique> table(schema, std::make_shared<BPTree<FieldDataShared, RecordUnique>>(storage));
 
   auto record = std::make_unique<Record>();

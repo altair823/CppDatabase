@@ -70,7 +70,7 @@ Binary Record::serialize() {
       index++;
     }
   }
-  return {std::move(binary), total_size};
+  return {std::move(binary), static_cast<unsigned long long>(total_size)};
 }
 
 Result<FieldDataShared, CannotConvert> type_to_field(Type type){

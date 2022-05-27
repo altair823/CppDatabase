@@ -5,6 +5,6 @@
 #ifndef CPPDATABASE_INCLUDES_TYPE_TYPES_H_
 #define CPPDATABASE_INCLUDES_TYPE_TYPES_H_
 
-#define BINARY_INDEX long long int
+#define BINARY_INDEX unsigned long long int
 
 #endif //CPPDATABASE_INCLUDES_TYPE_TYPES_H_

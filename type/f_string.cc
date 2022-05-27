@@ -25,7 +25,7 @@ Binary String::serialize() {
     b_index++;
   }
 
-  return {std::move(binary), b_index};
+  return {std::move(binary), static_cast<unsigned long long>(b_index)};
 }
 
 Result<BINARY_INDEX, DeserializeError> String::deserialize(BinaryRef binary, BINARY_INDEX begin) {

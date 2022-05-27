@@ -8,17 +8,18 @@
 #include "../storage_interface.h"
 #include "index_node.h"
 #include "data_node.h"
+#include "db_io.h"
 
 template <typename Key, typename Value>
 class BPTree : public Storage<Key, Value> {
  public:
- private:
- public:
+  explicit BPTree(std::string head_file): head(std::move(head_file), 0) {}
   bool insert(Key key, Value value, bool to_override) override;
   Result<Value, std::string> search(Key key) override;
   Result<std::vector<Value>, std::string> search(Key begin, Key end) override;
   bool remove(Key key) override;
-
+ private:
+  DBPointer head;
 };
 template<typename Key, typename Value>
 bool BPTree<Key, Value>::insert(Key key, Value value, bool to_override) {
@@ -26,11 +27,11 @@ bool BPTree<Key, Value>::insert(Key key, Value value, bool to_override) {
 }
 template<typename Key, typename Value>
 Result<Value, std::string> BPTree<Key, Value>::search(Key key) {
-  return Ok(nullptr);
+
 }
 template<typename Key, typename Value>
 Result<std::vector<Value>, std::string> BPTree<Key, Value>::search(Key begin, Key end) {
-  return Ok(std::vector<Value>());
+
 }
 template<typename Key, typename Value>
 bool BPTree<Key, Value>::remove(Key key) {
