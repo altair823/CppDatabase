@@ -13,18 +13,20 @@
 
 class String : public FieldData {
  public:
-  std::string str;
 
   String();
   explicit String(std::string str);
   Binary serialize() override;
-  Result<int> deserialize(BinaryRef binary, int begin) override;
-  int get_total_byte_size() const override;
+  Result<BINARY_INDEX, DeserializeError> deserialize(BinaryRef binary, BINARY_INDEX begin) override;
+  [[nodiscard]] int get_total_byte_size() const override;
+  [[nodiscard]] std::string get_string() const {return str;}
+  void set_string(std::string new_str) {str = new_str;}
 
  private:
+  std::string str;
   static int get_byte_count(int size);
   static int write_str_size_bits(std::unique_ptr<unsigned char[]> &binary, int size, int byte_count);
-  bool eq(const FieldData &field_type) const override;
+  [[nodiscard]] bool eq(const FieldData &field_type) const override;
   std::ostream& out(std::ostream& os) const override;
 };
 

@@ -28,20 +28,20 @@ Binary String::serialize() {
   return {std::move(binary), b_index};
 }
 
-Result<int> String::deserialize(BinaryRef binary, int begin) {
+Result<BINARY_INDEX, DeserializeError> String::deserialize(BinaryRef binary, BINARY_INDEX begin) {
   unsigned char type = 0;
   read_mem(binary.data[begin], type, Location_in_byte::First);
   unsigned char size_char_count = 0;
   read_mem(binary.data[begin], size_char_count, Location_in_byte::Second);
   int size = 0;
-  int index = begin + 1;
+  BINARY_INDEX index = begin + 1;
   for (int i = 0; i < size_char_count; i++) {
     size += binary.data[index] << 8 * (size_char_count - (i + 1));
     index++;
   }
 
   if (size > binary.length - 1 - size_char_count){
-    return Err(0, "Binary size error!");
+    return Err(DeserializeError("Binary size error!", begin));
   }
 
   for (int i = 0; i < size; i++) {
@@ -71,7 +71,7 @@ int String::write_str_size_bits(std::unique_ptr<unsigned char[]> &binary, int si
 }
 
 std::ostream &operator<<(std::ostream &os, const String &string) {
-  os << "field_type: " << string.field_type << " str: " << string.str;
+  os << "field_type: " << string.field_type << " str: " << string.get_string();
   return os;
 }
 

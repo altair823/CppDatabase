@@ -10,10 +10,10 @@
 template<typename Key, typename Value>
 class Storage{
  public:
-  virtual Result<bool> insert(Key key, Value value) = 0;
-  virtual Result<Value> search(Key key) = 0;
-  virtual Result<Value> pop(Key key) = 0;
-  virtual Result<bool> del(Key key) = 0;
+  virtual bool insert(Key key, Value value, bool to_override) = 0;
+  virtual Result<Value, std::string> search(Key key) = 0;
+  virtual Result<std::vector<Value>, std::string> search(Key begin, Key end) = 0;
+  virtual bool remove(Key key) = 0;
 };
 
 template<typename Key, typename Value>

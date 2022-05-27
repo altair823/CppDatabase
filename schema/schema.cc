@@ -38,9 +38,9 @@ bool Schema::verify_record(Record* record) {
 }
 SchemaBuilder::SchemaBuilder(std::string schema_name): schema_name(std::move(schema_name)) {}
 
-Result<SchemaBuilder*> SchemaBuilder::set_field(Type type, const std::string& name, KeyType key_type) {
+Result<SchemaBuilder*, AlreadyExist> SchemaBuilder::set_field(Type type, const std::string& name, KeyType key_type) {
   if (key_type == KeyType::PK && !this->pk_name.empty()) {
-    return Err((SchemaBuilderPtr)nullptr, "The PK is already set");
+    return Err(AlreadyExist("The PK is already set"));
   } else if (key_type == KeyType::PK) {
     this->pk_name = name;
   } else if (key_type == KeyType::FK) {
@@ -48,19 +48,19 @@ Result<SchemaBuilder*> SchemaBuilder::set_field(Type type, const std::string& na
   }
   for (auto& field: fields){
     if (field.name == name){
-      return Err((SchemaBuilderPtr) nullptr, "Field name \"" + name +"\" is already exist!");
+      return Err(AlreadyExist("Field name \"" + name +"\" is already exist!"));
     }
   }
   this->fields.emplace_back(type, name);
   return Ok(this);
 }
 
-Result<SchemaShared> SchemaBuilder::build(){
+Result<SchemaShared, NotFound> SchemaBuilder::build(){
   if (pk_name.empty()){
-    return Err((SchemaShared) nullptr, "The PK is not set!");
+    return Err(NotFound("The PK is not set!"));
   }
   else if (fields.empty()){
-    return Err((SchemaShared) nullptr, "There are no fields to build!");
+    return Err(NotFound("There are no fields to build!"));
   }
   SchemaShared new_schema = std::make_shared<Schema>(schema_name);
   new_schema->pk_name = pk_name;

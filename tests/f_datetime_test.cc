@@ -8,12 +8,12 @@
 
 TEST(DateTimeTest, SerializeTest) {
   DateTime d;
-  d.f_year = 30;
-  d.f_month = 10;
-  d.f_day = 30;
-  d.f_hour = 23;
-  d.f_min = 58;
-  d.f_sec = 34;
+  d.set_year(30);
+  d.set_month(10);
+  d.set_day(30);
+  d.set_hour(23);
+  d.set_min(58);
+  d.set_sec(34);
 
   // 00100001
   // 11101010

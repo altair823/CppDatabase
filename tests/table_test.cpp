@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <table.h>
-#include "storage/b_tree/bp_tree.h"
+#include "../storage/bp_tree/bp_tree.h"
 
 TEST(TableTest, InsertTest){
   SchemaBuilder builder("test_schema");
@@ -13,8 +13,8 @@ TEST(TableTest, InsertTest){
       ->set_field(Type::DATETIME, "datetime1", KeyType::FK).unwrap()
       ->set_field(Type::DATETIME, "datetime2").unwrap()->build().unwrap();
 
-  BTree<FieldDataShared, RecordUnique> storage;
-  Table<FieldDataShared, RecordUnique> table(schema, std::make_shared<BTree<FieldDataShared, RecordUnique>>(storage));
+  BPTree<FieldDataShared, RecordUnique> storage;
+  Table<FieldDataShared, RecordUnique> table(schema, std::make_shared<BPTree<FieldDataShared, RecordUnique>>(storage));
 
   auto record = std::make_unique<Record>();
   record->set_field(std::make_shared<String>("stringggg"), "string1");

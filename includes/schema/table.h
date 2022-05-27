@@ -13,7 +13,7 @@ template <typename Key, typename Value>
 class Table{
  public:
   Table(SchemaShared schema, StorageShared<Key, Value> storage);
-  Result<bool> add_record(Value record);
+  Result<bool, InsertionError> add_record(Value record);
 
 
   SchemaShared schema;
@@ -27,13 +27,13 @@ Table<Key, Value>::Table(SchemaShared schema, StorageShared<Key, Value> storage)
 
 }
 template<typename Key, typename Value>
-Result<bool> Table<Key, Value>::add_record(Value record) {
+Result<bool, InsertionError> Table<Key, Value>::add_record(Value record) {
   if (!schema->verify_record(record.get())){
-    return Err(false, "The record does not match with schema!");
+    return Err(InsertionError("The record does not match with schema!"));
   }
   auto key = record->get_field(schema->pk_name).unwrap()->data;
-  if (!storage->insert(key, std::move(record)).is_ok){
-    return Err(false, "Cannot insert record in the storage!");
+  if (!storage->insert(key, std::move(record), false)){
+    return Err(InsertionError("Cannot insert record in the storage!"));
   }
   return Ok(true);
 }

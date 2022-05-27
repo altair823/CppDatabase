@@ -57,8 +57,8 @@ class SchemaBuilder {
   std::vector<FieldSchema> fields;
 
   explicit SchemaBuilder(std::string schema_name);
-  Result<SchemaBuilder*> set_field(Type type, const std::string& name, KeyType key_type = KeyType::NONE);
-  Result<SchemaShared> build();
+  Result<SchemaBuilder*, AlreadyExist> set_field(Type type, const std::string& name, KeyType key_type = KeyType::NONE);
+  Result<SchemaShared, NotFound> build();
 };
 
 

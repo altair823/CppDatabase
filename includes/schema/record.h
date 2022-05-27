@@ -15,6 +15,8 @@
 #include <f_string.h>
 #include <f_datetime.h>
 
+#include <error.h>
+
 
 
 
@@ -30,8 +32,8 @@ class Record{
  public:
   Record();
 
-  Result<bool> set_field(std::shared_ptr<FieldData> data, const std::string& field_name);
-  [[nodiscard]] Result<FieldShared> get_field(const std::string& field_name) const;
+  Result<bool, AlreadyExist> set_field(std::shared_ptr<FieldData> data, const std::string& field_name);
+  [[nodiscard]] Result<FieldShared, NotFound> get_field(const std::string& field_name) const;
 
   Binary serialize();
 
@@ -44,7 +46,7 @@ class Record{
 
 typedef std::unique_ptr<Record> RecordUnique;
 
-Result<FieldDataShared> type_to_field(Type type);
+Result<FieldDataShared, CannotConvert> type_to_field(Type type);
 RecordUnique deserialize(BinaryRef binary, std::vector<std::string> &field_names);
 
 #endif //CPPDATABASE_INCLUDES_SCHEMA_RECORD_H_

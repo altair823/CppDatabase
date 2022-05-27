@@ -17,7 +17,7 @@ TEST(RecordTest, SetFieldTest){
 
   auto str1 = std::make_shared<String>();
 
-  str1->str = "this is string type variable. 이것은 문자열 타입 변수입니다.";
+  str1->set_string("this is string type variable. 이것은 문자열 타입 변수입니다.");
   record.set_field(str1, "string");
   // std::cout<<*schema.fields[1].type<<std::endl;
 
