@@ -5,6 +5,8 @@
 #ifndef CPPDATABASE_INCLUDES_STORAGE_BP_TREE_INDEX_NODE_H_
 #define CPPDATABASE_INCLUDES_STORAGE_BP_TREE_INDEX_NODE_H_
 
+#include <memory>
+
 #define LEAF true
 #define NOT_LEAF false
 

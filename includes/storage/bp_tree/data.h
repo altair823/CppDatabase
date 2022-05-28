@@ -5,6 +5,8 @@
 #ifndef CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DATA_H_
 #define CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DATA_H_
 
+#include <memory>
+
 template <typename Key, typename Value>
 class Data;
 

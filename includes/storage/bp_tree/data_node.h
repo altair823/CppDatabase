@@ -4,7 +4,10 @@
 
 #ifndef CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DATA_NODE_H_
 #define CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DATA_NODE_H_
+
+#include <memory>
 #include "data.h"
+
 template <typename Key, typename Pointer>
 class DataNode;
 
