@@ -7,6 +7,7 @@
 
 #include <bitset>
 #include <vector>
+#include <memory>
 
 #define BINARY_INDEX unsigned long long int
 
