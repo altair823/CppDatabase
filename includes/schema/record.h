@@ -21,7 +21,7 @@
 
 
 struct Field{
-  Field(std::shared_ptr<FieldData> data, std::string name): data(std::move(data)), name(std::move(name)){}
+  Field(FieldDataShared data, std::string name): data(std::move(data)), name(std::move(name)){}
   std::shared_ptr<FieldData> data;
   std::string name;
 };

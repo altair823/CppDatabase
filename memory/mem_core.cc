@@ -3,18 +3,8 @@
 //
 #include <mem_core.h>
 
-void set_field_type(unsigned char& dest, Type& field_type) {
-    auto type = static_cast<unsigned char>(field_type);
-    if (type < 16) {
-        std::bitset<4> t(type);
-        for (int i = 0; i < 4; i++) {
-            dest |= t[i] << i + 4;
-        }
-    }
-    // Assume the number of fields is less than 256.
-    else {
-        dest = type;
-    }
+Binary create_binary(BINARY_INDEX length) {
+  return {std::make_unique<unsigned char []>(length), length};
 }
 
 bool set_mem(unsigned char& dest, const unsigned char& value, Location_in_byte loc){
@@ -71,4 +61,34 @@ void read_mem(const unsigned char &origin1, const unsigned char &origin2, unsign
         auto c = (origin2 >> (i + 4)) & 1;
         value |= c << i;
     }
+}
+
+int byte_count_of_str(int size) {
+  int i = 0;
+  while (size > 0) {
+    size = size >> 8;
+    i++;
+  }
+  return i;
+}
+
+int write_str_size_bits(std::unique_ptr<unsigned char[]> &binary, int size, int byte_count) {
+  int b_index_after_header = 1;
+  for (int i = 0; i < byte_count; i++) {
+    int data = size >> ((byte_count - (i + 1)) * 8);
+    set_mem(binary[b_index_after_header], (char) data);
+    b_index_after_header++;
+  }
+  return b_index_after_header;
+}
+
+std::vector<unsigned char> num_to_char_vec(unsigned long long int num){
+  unsigned long long int a = (unsigned long long int)1 << 56;
+  std::vector<unsigned char> result;
+  while (a > 0) {
+    auto t = num / a;
+    result.push_back((char)t);
+    a = a >> 8;
+  }
+  return result;
 }

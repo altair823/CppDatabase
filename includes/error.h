@@ -6,7 +6,7 @@
 #define CPPDATABASE_INCLUDES_TYPE_ERROR_H_
 
 #include <utility>
-#include "type/types.h"
+#include <mem_core.h>
 
 class Error{
  public:

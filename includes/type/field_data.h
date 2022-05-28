@@ -11,39 +11,8 @@
 #include <result.h>
 #include "../error.h"
 #include "types.h"
+#include <mem_core.h>
 
-/**
- * Type of fields in DB schema.
- * The current number of types is up to 16.
- */
-enum class Type {
-  NONE = 0,
-  STRING, // 1
-  DATETIME, // 2
-  DATE, // 3
-  TIME, // 4
-  CHAR, // 5
-  SHORT, // 6
-  INT, // 7
-  BIGINT, // 8
-  FLOAT, // 9
-  DOUBLE, // 10
-  BIT, // 11
-  BLOB, // 12
-};
-
-struct Binary{
-  std::unique_ptr<unsigned char[]> data;
-  BINARY_INDEX length;
-
-  Binary(std::unique_ptr<unsigned char[]> data, BINARY_INDEX length): data(std::move(data)), length(length) {}
-};
-
-typedef Binary& BinaryRef;
-
-unsigned char type_to_4_bits(Type type);
-Type bits_to_type(unsigned char bits);
-std::ostream &operator<<(std::ostream &os, const Type &type);
 
 class FieldData {
  public:

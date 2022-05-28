@@ -8,14 +8,6 @@
 #include <f_string.h>
 #include <test_util.h>
 
-int get_byte_count(int size) {
-  int i = 0;
-  while (size > 0) {
-    size = size >> 8;
-    i++;
-  }
-  return i;
-}
 TEST(StringTest, StringBitTest) {
   std::string str =
       "달아 달아 밝은 달아 이태백이 놀던 달아 저기 저기 저달 속에 계수 나무 박혔으니 옥도끼로 찍어내어 금도끼로 다듬어서 초가삼간 집을 짓고 양친 부모 모셔다가 천년 만년 살고지고 천년 만년 살고지고";
@@ -36,7 +28,7 @@ TEST(StringTest, StringBitTest) {
   ASSERT_EQ(str, a);
 
   auto str_bit_count = str.size();
-  auto size_bit_count = get_byte_count((int) str_bit_count);
+  auto size_bit_count = byte_count_of_str((int) str_bit_count);
   //std::cout<<str_bit_count<<" "<<size_bit_count<<std::endl;
 
   ASSERT_EQ(str_bit_count, 269);

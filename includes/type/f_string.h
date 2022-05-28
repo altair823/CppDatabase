@@ -24,8 +24,6 @@ class String : public FieldData {
 
  private:
   std::string str;
-  static int get_byte_count(int size);
-  static int write_str_size_bits(std::unique_ptr<unsigned char[]> &binary, int size, int byte_count);
   [[nodiscard]] bool eq(const FieldData &field_type) const override;
   std::ostream& out(std::ostream& os) const override;
 };
