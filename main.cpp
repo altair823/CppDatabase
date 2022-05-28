@@ -1,7 +1,6 @@
 #include <f_datetime.h>
 #include <field_data.h>
 #include <iostream>
-#include "test/test_util.h"
 
 void print_bits(std::unique_ptr<unsigned char[]> &data, size_t length) {
   for (size_t i = 0; i < length; i++) {
@@ -28,7 +27,7 @@ int main() {
   // 00100010
 
   auto a = d.serialize();
-  print_bits(a);
+  print_bits(a.data, 6);
 
   std::cout << d << std::endl;
 
