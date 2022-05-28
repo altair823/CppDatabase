@@ -1,9 +1,10 @@
 #include <f_datetime.h>
 #include <field_data.h>
 #include <iostream>
+#include "test/test_util.h"
 
 void print_bits(std::unique_ptr<unsigned char[]> &data, size_t length) {
-  for (auto i = 0; i < length; i++) {
+  for (size_t i = 0; i < length; i++) {
     auto a = data[i];
     std::bitset<8> x(a);
     std::cout << x << std::endl;
@@ -12,12 +13,12 @@ void print_bits(std::unique_ptr<unsigned char[]> &data, size_t length) {
 
 int main() {
   DateTime d;
-  d.f_year = 30;
-  d.f_month = 10;
-  d.f_day = 30;
-  d.f_hour = 23;
-  d.f_min = 58;
-  d.f_sec = 34;
+  d.set_year(30);
+  d.set_month(10);
+  d.set_day(30);
+  d.set_hour(23);
+  d.set_min(58);
+  d.set_sec(34);
 
   // 00100001
   // 11101010
@@ -27,7 +28,7 @@ int main() {
   // 00100010
 
   auto a = d.serialize();
-  print_bits(a, 6);
+  print_bits(a);
 
   std::cout << d << std::endl;
 
