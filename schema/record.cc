@@ -40,15 +40,13 @@ bool Record::operator==(const Record &rhs) const {
     return false;
   }
 
-  for (auto& f: fields){
-    if (!rhs.get_field(f.name).unwrap()){
+  return (std::all_of(fields.begin(), fields.end(), [&rhs](const Field& field){
+    if (!rhs.get_field(field.name).unwrap() || *field.data != *rhs.get_field(field.name).unwrap()->data){
       return false;
+    } else{
+      return true;
     }
-    if (*f.data != *rhs.get_field(f.name).unwrap()->data){
-      return false;
-    }
-  }
-  return true;
+  }));
 }
 int Record::get_total_byte_size() const {
   int total_byte_size = 0;
@@ -58,19 +56,19 @@ int Record::get_total_byte_size() const {
   return total_byte_size;
 }
 
-Binary Record::serialize() {
+BinaryUnique Record::serialize() {
   int total_size = get_total_byte_size();
-  auto binary = std::make_unique<unsigned char[]>(total_size);
+  auto binary = BinaryFactory::create(total_size);
   int index = 0;
   for (auto& f: fields){
     auto b = f.data->serialize();
 
-    for (int i = 0; i < b.length; i++) {
-      set_mem(binary[index], b.data[i]);
+    for (int i = 0; i < b->get_length(); i++) {
+      binary->set_mem(index, b->read_mem(i));
       index++;
     }
   }
-  return {std::move(binary), static_cast<unsigned long long>(total_size)};
+  return binary;
 }
 
 Result<FieldDataShared, CannotConvert> type_to_field(Type type){
@@ -93,12 +91,11 @@ Result<FieldDataShared, CannotConvert> type_to_field(Type type){
   return Err(CannotConvert("Wrong type error!"));
 }
 
-RecordUnique deserialize(BinaryRef binary, std::vector<std::string> &field_names) {
+RecordUnique deserialize(Binary &binary, std::vector<std::string> &field_names) {
   auto schema = std::make_unique<Record>();
   int name_index = 0;
-  for (BINARY_INDEX index = 0; index < binary.length && name_index < field_names.size(); ){
-    unsigned char type = 0;
-    read_mem(binary.data[index], type, Location_in_byte::First);
+  for (BINARY_INDEX index = 0; index < binary.get_length() && name_index < field_names.size(); ){
+    unsigned char type = binary.read_mem(index, Location_in_byte::FirstFourBit);
     auto field = type_to_field(bits_to_type(type)).unwrap();
     auto index_before = field->deserialize(binary, index).unwrap();
     index = index_before;

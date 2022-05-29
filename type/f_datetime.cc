@@ -4,16 +4,16 @@
 
 #include <f_datetime.h>
 
-Binary DateTime::serialize() {
-  auto result = std::make_unique<unsigned char[]>(6);
-  set_mem(result[0], type_to_4_bits(field_type), Location_in_byte::First);
-  set_mem(result[0], result[1], f_year);
-  set_mem(result[1], f_month, Location_in_byte::Second);
-  set_mem(result[2], f_day);
-  set_mem(result[3], f_hour);
-  set_mem(result[4], f_min);
-  set_mem(result[5], f_sec);
-  return {std::move(result), 6};
+BinaryUnique DateTime::serialize() {
+  auto result = BinaryFactory::create(6);
+  result->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_bits(field_type));
+  result->set_mem(0, 1, f_year);
+  result->set_mem(1, Location_in_byte::SecondFourBit, f_month);
+  result->set_mem(2, f_day);
+  result->set_mem(3, f_hour);
+  result->set_mem(4, f_min);
+  result->set_mem(5, f_sec);
+  return result;
 }
 
 DateTime::DateTime() : FieldData(Type::DATETIME), f_year(0), f_month(0), f_day(0), f_hour(0), f_min(0), f_sec(0) {}
@@ -28,16 +28,16 @@ DateTime::DateTime(int year, char month, char day, char hour, char min, char sec
   }
 }
 
-Result<BINARY_INDEX, DeserializeError> DateTime::deserialize(BinaryRef binary, BINARY_INDEX begin) {
+Result<BINARY_INDEX, DeserializeError> DateTime::deserialize(Binary &binary, BINARY_INDEX begin) {
   unsigned char a = 0;
-  read_mem(binary.data[begin], a, Location_in_byte::First);
+  a = binary.read_mem(begin, Location_in_byte::FirstFourBit);
   this->field_type = bits_to_type(a);
-  read_mem(binary.data[begin], binary.data[begin + 1], this->f_year);
-  read_mem(binary.data[begin + 1], this->f_month, Location_in_byte::Second);
-  read_mem(binary.data[begin + 2], this->f_day);
-  read_mem(binary.data[begin + 3], this->f_hour);
-  read_mem(binary.data[begin + 4], this->f_min);
-  read_mem(binary.data[begin + 5], this->f_sec);
+  this->f_year = binary.read_mem(begin, begin + 1);
+  this->f_month = binary.read_mem(begin + 1, Location_in_byte::SecondFourBit);
+  this->f_day = binary.read_mem(begin + 2);
+  this->f_hour = binary.read_mem(begin + 3);
+  this->f_min = binary.read_mem(begin + 4);
+  this->f_sec = binary.read_mem(begin + 5);
   return Ok(begin + 6);
 }
 

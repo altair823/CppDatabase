@@ -10,17 +10,18 @@
 #include <cmath>
 #include <ostream>
 #include <iostream>
+#include <utility>
 
 class String : public FieldData {
  public:
 
   String();
   explicit String(std::string str);
-  Binary serialize() override;
-  Result<BINARY_INDEX, DeserializeError> deserialize(BinaryRef binary, BINARY_INDEX begin) override;
+  BinaryUnique serialize() override;
+  Result<BINARY_INDEX, DeserializeError> deserialize(Binary &binary, BINARY_INDEX begin) override;
   [[nodiscard]] int get_total_byte_size() const override;
   [[nodiscard]] std::string get_string() const {return str;}
-  void set_string(std::string new_str) {str = new_str;}
+  void set_string(std::string new_str) {str = std::move(new_str);}
 
  private:
   std::string str;

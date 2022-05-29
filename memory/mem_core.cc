@@ -3,65 +3,7 @@
 //
 #include <mem_core.h>
 
-Binary create_binary(BINARY_INDEX length) {
-  return {std::make_unique<unsigned char []>(length), length};
-}
 
-bool set_mem(unsigned char& dest, const unsigned char& value, Location_in_byte loc){
-    if (value > 15){
-        return false;
-    }
-    auto v = std::bitset<4>(value);
-    if (loc == Location_in_byte::First){
-        for (char i = 0; i < 4; i++){
-            dest |= v[i] << i + 4;
-        }
-    } else{
-        for (char i = 0; i < 4; i++){
-            dest |= v[i] << i;
-        }
-    }
-    return true;
-}
-
-void set_mem(unsigned char& dest, const unsigned char& value){
-    dest = value;
-}
-
-void set_mem(unsigned char& dest1, unsigned char& dest2, const unsigned char& value){
-    std::bitset<8> y(value);
-    for (int i = 0; i < 4; i++){
-        dest1 |= y[i+4] << i;
-        dest2 |= y[i] << i + 4;
-    }
-}
-
-void read_mem(const unsigned char &origin, unsigned char &value, Location_in_byte loc) {
-    if (loc == Location_in_byte::First){
-        for (int i = 0; i < 4; i++){
-            auto b = (origin >> (i + 4)) & 1;
-            value |= b << i;
-        }
-    } else {
-        for (int i = 0; i < 4; i++){
-            auto b = (origin >> i) & 1;
-            value |= b << i;
-        }
-    }
-}
-
-void read_mem(const unsigned char &origin, unsigned char &value) {
-    value = origin;
-}
-
-void read_mem(const unsigned char &origin1, const unsigned char &origin2, unsigned char &value) {
-    for (int i = 0; i < 4; i++){
-        auto b = (origin1 >> i) & 1;
-        value |= b << (i + 4);
-        auto c = (origin2 >> (i + 4)) & 1;
-        value |= c << i;
-    }
-}
 
 int byte_count_of_str(int size) {
   int i = 0;
@@ -72,11 +14,11 @@ int byte_count_of_str(int size) {
   return i;
 }
 
-int write_str_size_bits(std::unique_ptr<unsigned char[]> &binary, int size, int byte_count) {
+int write_str_size_bits(BinaryUnique &binary, int size, int byte_count) {
   int b_index_after_header = 1;
   for (int i = 0; i < byte_count; i++) {
     int data = size >> ((byte_count - (i + 1)) * 8);
-    set_mem(binary[b_index_after_header], (char) data);
+    binary->set_mem(b_index_after_header, (char) data);
     b_index_after_header++;
   }
   return b_index_after_header;
@@ -89,6 +31,84 @@ std::vector<unsigned char> num_to_char_vec(unsigned long long int num){
     auto t = num / a;
     result.push_back((char)t);
     a = a >> 8;
+  }
+  return result;
+}
+
+BinaryUnique BinaryFactory::create(unsigned long long length) {
+  std::unique_ptr<Binary> binary(new Binary(length));
+  return binary;
+}
+
+Binary::Binary(unsigned long long int length): length(length) {
+  if (length == 0){
+    data = nullptr;
+  } else {
+    data = std::make_unique<unsigned char[]>(length);
+  }
+}
+
+void Binary::set_mem(unsigned long long int index, Location_in_byte loc, const unsigned char &value) {
+  verify_index(index);
+  if (value > 15) {
+    throw std::overflow_error("The value is 16 or higher! ");
+  }
+  auto v = std::bitset<4>(value);
+  if (loc == Location_in_byte::FirstFourBit) {
+    for (char i = 0; i < 4; i++) {
+      data[index] |= v[i] << i + 4;
+    }
+  } else {
+    for (char i = 0; i < 4; i++) {
+      data[index] |= v[i] << i;
+    }
+  }
+}
+void Binary::set_mem(unsigned long long int index, const unsigned char &value) {
+  verify_index(index);
+  data[index] = value;
+}
+void Binary::set_mem(unsigned long long int index1, unsigned long long int index2, const unsigned char &value) {
+  verify_index(index1);
+  verify_index(index2);
+  std::bitset<8> y(value);
+  for (int i = 0; i < 4; i++) {
+    data[index1] |= y[i + 4] << i;
+    data[index2] |= y[i] << i + 4;
+  }
+}
+void Binary::verify_index(BINARY_INDEX index) const {
+  if (index >= length){
+    throw std::range_error("Binary index is out of range!");
+  } else if (data == nullptr){
+    assert("Wrong binary!");
+  }
+}
+unsigned char Binary::read_mem(const unsigned char &origin, Location_in_byte loc) {
+  unsigned char result = 0;
+  if (loc == Location_in_byte::FirstFourBit) {
+    for (int i = 0; i < 4; i++) {
+      auto b = (origin >> (i + 4)) & 1;
+      result |= b << i;
+    }
+  } else {
+    for (int i = 0; i < 4; i++) {
+      auto b = (origin >> i) & 1;
+      result |= b << i;
+    }
+  }
+  return result;
+}
+unsigned char Binary::read_mem(const unsigned char &origin) {
+  return origin;
+}
+unsigned char Binary::read_mem(const unsigned char &origin1, const unsigned char &origin2) {
+  unsigned char result = 0;
+  for (int i = 0; i < 4; i++) {
+    auto b = (origin1 >> i) & 1;
+    result |= b << (i + 4);
+    auto c = (origin2 >> (i + 4)) & 1;
+    result |= c << i;
   }
   return result;
 }

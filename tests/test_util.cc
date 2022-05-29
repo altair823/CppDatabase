@@ -3,9 +3,9 @@
 //
 #include <test_util.h>
 
-void print_bits(BinaryRef binary) {
-  for (auto i = 0; i < binary.length; i++) {
-    auto a = binary.data[i];
+void print_bits(Binary &binary) {
+  for (auto i = 0; i < binary.get_length(); i++) {
+    auto a = binary.read_mem(i);
     std::bitset<8> x(a);
     std::cout << x << std::endl;
   }

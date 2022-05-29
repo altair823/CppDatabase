@@ -13,13 +13,13 @@
 
 class DateTime : public FieldData {
  public:
-  int get_total_byte_size() const override;
+  [[nodiscard]] int get_total_byte_size() const override;
 
   DateTime();
   DateTime(int year, char month, char day, char hour, char min, char sec);
 
-  Binary serialize() override;
-  Result<BINARY_INDEX, DeserializeError> deserialize(BinaryRef binary, BINARY_INDEX begin) override;
+  BinaryUnique serialize() override;
+  Result<BINARY_INDEX, DeserializeError> deserialize(Binary &binary, BINARY_INDEX begin) override;
 
   [[nodiscard]] unsigned char get_year() const {return f_year;}
   [[nodiscard]] unsigned char get_month() const {return f_month;}
@@ -27,23 +27,23 @@ class DateTime : public FieldData {
   [[nodiscard]] unsigned char get_hour() const {return f_hour;}
   [[nodiscard]] unsigned char get_min() const {return f_min;}
   [[nodiscard]] unsigned char get_sec() const {return f_sec;}
-  void set_year(unsigned char f_year) {
-    DateTime::f_year = f_year;
+  void set_year(unsigned char year) {
+    DateTime::f_year = year;
   }
-  void set_month(unsigned char f_month) {
-    DateTime::f_month = f_month;
+  void set_month(unsigned char month) {
+    DateTime::f_month = month;
   }
-  void set_day(unsigned char f_day) {
-    DateTime::f_day = f_day;
+  void set_day(unsigned char day) {
+    DateTime::f_day = day;
   }
-  void set_hour(unsigned char f_hour) {
-    DateTime::f_hour = f_hour;
+  void set_hour(unsigned char hour) {
+    DateTime::f_hour = hour;
   }
-  void set_min(unsigned char f_min) {
-    DateTime::f_min = f_min;
+  void set_min(unsigned char min) {
+    DateTime::f_min = min;
   }
-  void set_sec(unsigned char f_sec) {
-    DateTime::f_sec = f_sec;
+  void set_sec(unsigned char sec) {
+    DateTime::f_sec = sec;
   }
  private:
   unsigned char f_year; // 8bits

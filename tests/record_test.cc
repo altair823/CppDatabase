@@ -82,7 +82,7 @@ TEST(RecordTest, DeserializeTest){
   //print_bits(b);
 
 
-  RecordUnique record_unique = deserialize(b, field_names);
+  RecordUnique record_unique = deserialize(*b, field_names);
   //std::cout<<*schema_unique<<std::endl;
 
   ASSERT_EQ(record, *record_unique);

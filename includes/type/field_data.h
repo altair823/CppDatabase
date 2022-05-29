@@ -20,8 +20,8 @@ class FieldData {
   FieldData(const FieldData& field_data);
   virtual ~FieldData() = default;
   explicit FieldData(Type field_type);
-  virtual Binary serialize() = 0;
-  virtual Result<BINARY_INDEX, DeserializeError> deserialize(BinaryRef binary, BINARY_INDEX begin) = 0;
+  virtual BinaryUnique serialize() = 0;
+  virtual Result<BINARY_INDEX, DeserializeError> deserialize(Binary &binary, BINARY_INDEX begin) = 0;
   [[nodiscard]] virtual int get_total_byte_size() const = 0;
 
   bool operator==(const FieldData &rhs) const;

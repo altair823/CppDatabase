@@ -18,8 +18,8 @@
 class DBPointer {
  public:
   DBPointer(std::string file, OFFSET offset) : file_name(std::move(file)), offset(offset) {}
-  Binary serialize();
-  Result<BINARY_INDEX, DeserializeError> deserialize(BinaryRef binary, BINARY_INDEX start_index);
+  BinaryUnique serialize();
+  Result<BINARY_INDEX, DeserializeError> deserialize(Binary &binary, BINARY_INDEX start_index);
  private:
   std::string file_name;
   OFFSET offset;

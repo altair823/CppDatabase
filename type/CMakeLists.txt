@@ -3,7 +3,6 @@ add_library(
         field_data.cc
         f_datetime.cc
         f_string.cc
-        f_date.cc
 )
 
 target_include_directories(

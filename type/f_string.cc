@@ -8,44 +8,38 @@
 
 String::String() : FieldData(Type::STRING) {}
 
-Binary String::serialize() {
-  auto binary = std::make_unique<unsigned char[]>(str.size() + 2);
-  set_mem(binary[0], type_to_4_bits(Type::STRING), Location_in_byte::First);
+BinaryUnique String::serialize() {
+  auto binary = BinaryFactory::create(str.size() + 2);
+  binary->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_bits(Type::STRING));
   int str_bits = (int) str.size();
   auto byte_count = byte_count_of_str(str_bits);
   if (byte_count > 15) {
-    return {nullptr, 0};
+    return WRONG_BINARY;
   }
-  set_mem(binary[0], byte_count, Location_in_byte::Second);
+  binary->set_mem(0, Location_in_byte::SecondFourBit, byte_count);
 
   auto b_index = write_str_size_bits(binary, str_bits, byte_count);
 
   for (auto& c : str) {
-    set_mem(binary[b_index], c);
+    binary->set_mem(b_index, c);
     b_index++;
   }
 
-  return {std::move(binary), static_cast<unsigned long long>(b_index)};
+  return binary;
 }
 
-Result<BINARY_INDEX, DeserializeError> String::deserialize(BinaryRef binary, BINARY_INDEX begin) {
-  unsigned char type = 0;
-  read_mem(binary.data[begin], type, Location_in_byte::First);
-  unsigned char size_char_count = 0;
-  read_mem(binary.data[begin], size_char_count, Location_in_byte::Second);
+Result<BINARY_INDEX, DeserializeError> String::deserialize(Binary &binary, BINARY_INDEX begin) {
+  unsigned char type = binary.read_mem(begin, Location_in_byte::FirstFourBit);
+  unsigned char size_char_count = binary.read_mem(begin, Location_in_byte::SecondFourBit);
   int size = 0;
   BINARY_INDEX index = begin + 1;
   for (int i = 0; i < size_char_count; i++) {
-    size += binary.data[index] << 8 * (size_char_count - (i + 1));
+    size += binary.read_mem(index) << 8 * (size_char_count - (i + 1));
     index++;
   }
 
-  if (size > binary.length - 1 - size_char_count){
-    return Err(DeserializeError("Binary size error!", begin));
-  }
-
   for (int i = 0; i < size; i++) {
-    str.push_back((char) binary.data[index]);
+    str.push_back((char) binary.read_mem(index));
     index++;
   }
   return Ok(index);

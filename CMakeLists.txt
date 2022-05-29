@@ -10,7 +10,10 @@ add_executable(
         CppDatabase
         main.cpp
 )
-target_compile_options(CppDatabase PUBLIC -Wall -Werror -std=c++20)
+target_compile_options(CppDatabase
+        PUBLIC
+        #-Wall -Werror
+        -std=c++20)
 
 add_subdirectory(tests)
 

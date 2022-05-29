@@ -8,6 +8,6 @@
 #include <iostream>
 #include <field_data.h>
 
-void print_bits(BinaryRef binary);
+void print_bits(Binary &binary);
 
 #endif //CPPDATABASE_TEST_UTIL_H

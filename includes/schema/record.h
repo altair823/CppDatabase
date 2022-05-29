@@ -35,7 +35,7 @@ class Record{
   Result<bool, AlreadyExist> set_field(std::shared_ptr<FieldData> data, const std::string& field_name);
   [[nodiscard]] Result<FieldShared, NotFound> get_field(const std::string& field_name) const;
 
-  Binary serialize();
+  BinaryUnique serialize();
 
   [[nodiscard]] int get_total_byte_size() const;
   friend std::ostream &operator<<(std::ostream &os, const Record &schema);
@@ -47,6 +47,6 @@ class Record{
 typedef std::unique_ptr<Record> RecordUnique;
 
 Result<FieldDataShared, CannotConvert> type_to_field(Type type);
-RecordUnique deserialize(BinaryRef binary, std::vector<std::string> &field_names);
+RecordUnique deserialize(Binary &binary, std::vector<std::string> &field_names);
 
 #endif //CPPDATABASE_INCLUDES_SCHEMA_RECORD_H_

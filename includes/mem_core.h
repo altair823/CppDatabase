@@ -8,37 +8,48 @@
 #include <bitset>
 #include <vector>
 #include <memory>
+#include <stdexcept>
 
 #define BINARY_INDEX unsigned long long int
 
-struct Binary{
+enum class Location_in_byte {
+  FirstFourBit,
+  SecondFourBit,
+};
+
+class Binary;
+
+using BinaryUnique = std::unique_ptr<Binary>;
+
+class BinaryFactory {
+ public:
+  static BinaryUnique create(BINARY_INDEX length);
+};
+
+class Binary{
+ public:
+  [[nodiscard]] BINARY_INDEX get_length() const{return length;}
+
+  void set_mem(BINARY_INDEX index, Location_in_byte loc, const unsigned char &value);
+  void set_mem(BINARY_INDEX index, const unsigned char &value);
+  void set_mem(BINARY_INDEX index1, BINARY_INDEX index2, const unsigned char &value);
+
+  unsigned char read_mem(const unsigned char &origin, Location_in_byte loc);
+  unsigned char read_mem(const unsigned char &origin);
+  unsigned char read_mem(const unsigned char &origin1, const unsigned char &origin2);
+ private:
+  friend class BinaryFactory;
+
   std::unique_ptr<unsigned char[]> data;
   BINARY_INDEX length;
 
-  Binary(std::unique_ptr<unsigned char[]> data, BINARY_INDEX length): data(std::move(data)), length(length) {}
+  explicit Binary(BINARY_INDEX length);
+  void verify_index(BINARY_INDEX index) const;
 };
-#define WRONG_BINARY Binary(nullptr, 0)
-
-typedef Binary& BinaryRef;
-
-Binary create_binary(BINARY_INDEX length);
-
-enum class Location_in_byte {
-  First,
-  Second,
-};
-
-
-bool set_mem(unsigned char &dest, const unsigned char &value, Location_in_byte loc);
-void set_mem(unsigned char &dest, const unsigned char &value);
-void set_mem(unsigned char &dest1, unsigned char &dest2, const unsigned char &value);
-
-void read_mem(const unsigned char &origin, unsigned char &value, Location_in_byte loc);
-void read_mem(const unsigned char &origin, unsigned char &value);
-void read_mem(const unsigned char &origin1, const unsigned char &origin2, unsigned char &value);
+#define WRONG_BINARY BinaryFactory::create(0)
 
 int byte_count_of_str(int size);
 std::vector<unsigned char> num_to_char_vec(unsigned long long int num);
-int write_str_size_bits(std::unique_ptr<unsigned char[]> &binary, int size, int byte_count);
+int write_str_size_bits(BinaryUnique &binary, int size, int byte_count);
 
 #endif //CPPDATABASE_DATACORE_H

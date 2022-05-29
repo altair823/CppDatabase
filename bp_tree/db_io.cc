@@ -6,7 +6,7 @@
 Result<BINARY_INDEX, DeserializeError> DBPointer::deserialize(Binary &binary, unsigned long long int start_index) {
 
 }
-Binary DBPointer::serialize() {
+BinaryUnique DBPointer::serialize() {
   auto file_name_byte_count = byte_count_of_str((int) file_name.size());
   if (file_name_byte_count > 225){
     return WRONG_BINARY;
@@ -24,19 +24,20 @@ Binary DBPointer::serialize() {
     return WRONG_BINARY;
   }
   char offset_byte_count = (char)valid_offset_bytes.size();
-  auto binary = create_binary(1 + file_name_byte_count + 1 + offset_byte_count);
+  auto binary = BinaryFactory::create(1 + file_name_byte_count + 1 + offset_byte_count);
   int index = 0;
-  set_mem(binary.data[index], file_name_byte_count);
+  binary->set_mem(index, file_name_byte_count);
   index++;
   for (int i = 0; i < file_name_byte_count; i++){
-    set_mem(binary.data[index], file_name[i]);
+    binary->set_mem(index, file_name[i]);
     index++;
   }
-  set_mem(binary.data[index], offset_byte_count);
+  binary->set_mem(index, offset_byte_count);
   index++;
   for (int i = 0; i < offset_byte_count; i++){
-    set_mem(binary.data[index], valid_offset_bytes[i]);
+    binary->set_mem(index, valid_offset_bytes[i]);
     index++;
   }
+  return binary;
 }
 

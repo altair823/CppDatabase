@@ -17,10 +17,8 @@ TEST(StringTest, StringBitTest) {
   }
 
   std::string a;
-  std::unique_ptr<unsigned char[]> p(new unsigned char[a.size()]);
   for (int i = 0; i < str.size(); i++) {
     a.push_back((char) v[i]);
-    set_mem(p[i], v[i]);
   }
 
   //print_bits(p, a.size());
@@ -48,7 +46,7 @@ TEST(StringTest, SerializeTest) {
   //print_bits(b, 272);
 
   String t;
-  t.deserialize(b, 0);
+  t.deserialize(*b, 0);
   //std::cout<<t<<std::endl;
 
   ASSERT_EQ(a, t);
