@@ -5,6 +5,7 @@
 #ifndef CPPDATABASE_INCLUDES_STORAGE_STORAGE_INTERFACE_H_
 #define CPPDATABASE_INCLUDES_STORAGE_STORAGE_INTERFACE_H_
 
+#include <memory>
 #include <result.h>
 
 template<typename Key, typename Value>
