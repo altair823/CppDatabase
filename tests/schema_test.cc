@@ -13,7 +13,7 @@ TEST(SchemaTest, SetFieldTest){
       ->set_field(Type::DATETIME, "datetime1", KeyType::FK).unwrap()
       ->set_field(Type::DATETIME, "datetime2").unwrap()->build().unwrap();
 
-  std::cout<< *schema << std::endl;
+  // std::cout<< *schema << std::endl;
 }
 
 TEST(SchemaTest, VerifyRecordTest){
