@@ -9,19 +9,24 @@
 String::String() : FieldData(Type::STRING) {}
 
 BinaryUnique String::serialize() {
-  auto binary = BinaryFactory::create(str.size() + 2);
-  binary->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_bits(Type::STRING));
   int str_bits = (int) str.size();
   auto byte_count = byte_count_of_str(str_bits);
   if (byte_count > 15) {
     return WRONG_BINARY;
   }
+  auto binary = BinaryFactory::create(str.size() + 1 + byte_count);
+  binary->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_bits(Type::STRING));
   binary->set_mem(0, Location_in_byte::SecondFourBit, byte_count);
 
-  auto b_index = write_str_size_bits(binary, str_bits, byte_count);
+  BINARY_INDEX b_index = 1;
+  for (int i = 0; i < byte_count; i++) {
+    int data = str_bits >> ((byte_count - (i + 1)) * 8);
+    binary->set_mem(b_index, (char) data);
+    b_index++;
+  }
 
-  for (auto& c : str) {
-    binary->set_mem(b_index, c);
+  for (int i = 0; i < str.size(); i++) {
+    binary->set_mem(b_index, str[i]);
     b_index++;
   }
 

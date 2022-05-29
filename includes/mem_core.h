@@ -34,9 +34,9 @@ class Binary{
   void set_mem(BINARY_INDEX index, const unsigned char &value);
   void set_mem(BINARY_INDEX index1, BINARY_INDEX index2, const unsigned char &value);
 
-  unsigned char read_mem(const unsigned char &origin, Location_in_byte loc);
-  unsigned char read_mem(const unsigned char &origin);
-  unsigned char read_mem(const unsigned char &origin1, const unsigned char &origin2);
+  unsigned char read_mem(BINARY_INDEX index, Location_in_byte loc);
+  unsigned char read_mem(BINARY_INDEX index);
+  unsigned char read_mem(BINARY_INDEX index1, BINARY_INDEX index2);
  private:
   friend class BinaryFactory;
 

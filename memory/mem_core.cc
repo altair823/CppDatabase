@@ -84,30 +84,30 @@ void Binary::verify_index(BINARY_INDEX index) const {
     assert("Wrong binary!");
   }
 }
-unsigned char Binary::read_mem(const unsigned char &origin, Location_in_byte loc) {
+unsigned char Binary::read_mem(BINARY_INDEX index, Location_in_byte loc) {
   unsigned char result = 0;
   if (loc == Location_in_byte::FirstFourBit) {
     for (int i = 0; i < 4; i++) {
-      auto b = (origin >> (i + 4)) & 1;
+      auto b = (data[index] >> (i + 4)) & 1;
       result |= b << i;
     }
   } else {
     for (int i = 0; i < 4; i++) {
-      auto b = (origin >> i) & 1;
+      auto b = (data[index] >> i) & 1;
       result |= b << i;
     }
   }
   return result;
 }
-unsigned char Binary::read_mem(const unsigned char &origin) {
-  return origin;
+unsigned char Binary::read_mem(BINARY_INDEX index) {
+  return data[index];
 }
-unsigned char Binary::read_mem(const unsigned char &origin1, const unsigned char &origin2) {
+unsigned char Binary::read_mem(BINARY_INDEX index1, BINARY_INDEX index2) {
   unsigned char result = 0;
   for (int i = 0; i < 4; i++) {
-    auto b = (origin1 >> i) & 1;
+    auto b = (data[index1] >> i) & 1;
     result |= b << (i + 4);
-    auto c = (origin2 >> (i + 4)) & 1;
+    auto c = (data[index2] >> (i + 4)) & 1;
     result |= c << i;
   }
   return result;
