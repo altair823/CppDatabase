@@ -80,8 +80,6 @@ void Binary::set_mem(unsigned long long int index1, unsigned long long int index
 void Binary::verify_index(BINARY_INDEX index) const {
   if (index >= length){
     throw std::range_error("Binary index is out of range!");
-  } else if (data == nullptr){
-    assert("Wrong binary!");
   }
 }
 unsigned char Binary::read_mem(BINARY_INDEX index, Location_in_byte loc) {
