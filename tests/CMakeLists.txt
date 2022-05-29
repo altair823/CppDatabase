@@ -31,6 +31,7 @@ target_include_directories(
         test
         PUBLIC
         ${PROJECT_SOURCE_DIR}/includes/test
+        ${PROJECT_SOURCE_DIR}/includes
 )
 
 
@@ -41,10 +42,8 @@ target_compile_options(
         test
         PRIVATE
         #-Wall -Werror
-        -std=c++20)
-
-target_include_directories(
-        test
-        PUBLIC
-        ${PROJECT_SOURCE_DIR}/includes
+        -D_FILE_OFFSET_BITS=64
+        -D_LARGEFILE64_SOURCE
+        -std=c++20
 )
+#set_target_properties(test PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
