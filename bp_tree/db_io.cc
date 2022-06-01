@@ -3,11 +3,27 @@
 //
 #include "db_io.h"
 
-Result<BINARY_INDEX, DeserializeError> DBPointer::deserialize(Binary &binary, unsigned long long int start_index) {
-
+Result<BINARY_INDEX, DeserializeError> DBPointer::deserialize(const Binary &binary, unsigned long long int start_index) {
+  BINARY_INDEX index = start_index;
+  auto file_name_byte_count = binary.read_mem(index);
+  index++;
+  for (int i = 0; i < file_name_byte_count; i++){
+    char b = (char)binary.read_mem(index);
+    file_name.push_back((char)b);
+    index++;
+  }
+  auto offset_byte_count = binary.read_mem(index);
+  index++;
+  std::vector<unsigned char> valid_offset_bytes;
+  for (int i = 0; i < offset_byte_count; i++){
+    valid_offset_bytes.push_back(binary.read_mem(index));
+    index++;
+  }
+  this->offset = char_vec_to_num(valid_offset_bytes);
+  return Ok(index);
 }
-BinaryUnique DBPointer::serialize() {
-  auto file_name_byte_count = byte_count_of_str((int) file_name.size());
+BinaryUnique DBPointer::serialize() const {
+  auto file_name_byte_count = (int) file_name.size();
   if (file_name_byte_count > 225){
     return WRONG_BINARY;
   }
@@ -23,7 +39,7 @@ BinaryUnique DBPointer::serialize() {
   if (valid_offset_bytes.size() >= 256){
     return WRONG_BINARY;
   }
-  char offset_byte_count = (char)valid_offset_bytes.size();
+  auto offset_byte_count = (unsigned char)valid_offset_bytes.size();
   auto binary = BinaryFactory::create(1 + file_name_byte_count + 1 + offset_byte_count);
   int index = 0;
   binary->set_mem(index, file_name_byte_count);
@@ -39,5 +55,13 @@ BinaryUnique DBPointer::serialize() {
     index++;
   }
   return binary;
+}
+std::ostream &operator<<(std::ostream &os, const DBPointer &pointer) {
+  os << "file_name: " << pointer.file_name << ", offset: " << pointer.offset;
+  return os;
+}
+bool DBPointer::operator==(const DBPointer &rhs) const {
+  return file_name == rhs.file_name &&
+      offset == rhs.offset;
 }
 

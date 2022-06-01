@@ -28,6 +28,11 @@ class DeserializeError : public Error{
   BINARY_INDEX previous_index;
 };
 
+class SerializeError : public Error {
+ public:
+  explicit SerializeError(std::string msg): Error(std::move(msg), "SerializeError") {}
+};
+
 class AlreadyExist : public Error {
  public:
   explicit AlreadyExist(std::string msg): Error(std::move(msg), "AlreadyExist") {}

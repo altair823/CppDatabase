@@ -4,7 +4,7 @@
 
 #include <f_datetime.h>
 
-BinaryUnique DateTime::serialize() {
+BinaryUnique DateTime::serialize() const {
   auto result = BinaryFactory::create(6);
   result->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_bits(field_type));
   result->set_mem(0, 1, f_year);
@@ -28,7 +28,7 @@ DateTime::DateTime(int year, char month, char day, char hour, char min, char sec
   }
 }
 
-Result<BINARY_INDEX, DeserializeError> DateTime::deserialize(Binary &binary, BINARY_INDEX begin) {
+Result<BINARY_INDEX, DeserializeError> DateTime::deserialize(const Binary &binary, BINARY_INDEX begin) {
   unsigned char a = 0;
   a = binary.read_mem(begin, Location_in_byte::FirstFourBit);
   this->field_type = bits_to_type(a);

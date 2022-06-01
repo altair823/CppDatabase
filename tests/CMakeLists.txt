@@ -19,7 +19,7 @@ add_executable(
         test_util.cc
         f_datetime_test.cc
         f_string_test.cc
-        record_test.cc schema_test.cc table_test.cpp bp_tree_test.cpp db_io_test.cc)
+        record_test.cc schema_test.cc table_test.cpp bp_tree_test.cpp db_io_test.cc mem_core_test.cpp index_node_test.cpp)
 target_link_libraries(
         test
         gtest_main

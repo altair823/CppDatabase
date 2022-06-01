@@ -3,3 +3,5 @@
 /.vscode/
 /build/
 /cmake-build-debug/
+/upload_pi.sh
+/rsync_exclude.txt

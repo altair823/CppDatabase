@@ -18,8 +18,8 @@ class DateTime : public FieldData {
   DateTime();
   DateTime(int year, char month, char day, char hour, char min, char sec);
 
-  BinaryUnique serialize() override;
-  Result<BINARY_INDEX, DeserializeError> deserialize(Binary &binary, BINARY_INDEX begin) override;
+  [[nodiscard]] BinaryUnique serialize() const override;
+  Result<BINARY_INDEX, DeserializeError> deserialize(const Binary &binary, BINARY_INDEX begin) override;
 
   [[nodiscard]] unsigned char get_year() const {return f_year;}
   [[nodiscard]] unsigned char get_month() const {return f_month;}

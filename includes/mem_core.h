@@ -9,6 +9,7 @@
 #include <vector>
 #include <memory>
 #include <stdexcept>
+#include <ostream>
 
 #define BINARY_INDEX unsigned long long int
 
@@ -34,9 +35,13 @@ class Binary{
   void set_mem(BINARY_INDEX index, const unsigned char &value);
   void set_mem(BINARY_INDEX index1, BINARY_INDEX index2, const unsigned char &value);
 
-  unsigned char read_mem(BINARY_INDEX index, Location_in_byte loc);
-  unsigned char read_mem(BINARY_INDEX index);
-  unsigned char read_mem(BINARY_INDEX index1, BINARY_INDEX index2);
+  [[nodiscard]] unsigned char read_mem(BINARY_INDEX index, Location_in_byte loc) const;
+  [[nodiscard]] unsigned char read_mem(BINARY_INDEX index) const;
+  [[nodiscard]] unsigned char read_mem(BINARY_INDEX index1, BINARY_INDEX index2) const;
+
+  BinaryUnique operator+(const Binary& binary_ref) const;
+  friend std::ostream &operator<<(std::ostream &os, const Binary &binary);
+
  private:
   friend class BinaryFactory;
 
@@ -50,6 +55,7 @@ class Binary{
 
 int byte_count_of_str(int size);
 std::vector<unsigned char> num_to_char_vec(unsigned long long int num);
+unsigned long long char_vec_to_num(std::vector<unsigned char> char_vec);
 int write_str_size_bits(BinaryUnique &binary, int size, int byte_count);
 
 #endif //CPPDATABASE_DATACORE_H

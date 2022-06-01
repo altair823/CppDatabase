@@ -7,34 +7,33 @@
 
 #include <fstream>
 #include <utility>
-#include "index_node.h"
-#include "data_node.h"
 #include <mem_core.h>
 #include <result.h>
 #include <error.h>
+#include <ostream>
+#include <serializable.h>
 
 #define OFFSET unsigned long long int
 
-class DBPointer {
+enum class NodeType {
+  None,
+  IndexNode,
+  DataNode,
+};
+
+class DBPointer : public Serializable{
  public:
+  DBPointer(): offset(0) {}
   DBPointer(std::string file, OFFSET offset) : file_name(std::move(file)), offset(offset) {}
-  BinaryUnique serialize();
-  Result<BINARY_INDEX, DeserializeError> deserialize(Binary &binary, BINARY_INDEX start_index);
+  [[nodiscard]] BinaryUnique serialize() const override;
+  bool operator==(const DBPointer &rhs) const;
+  Result<BINARY_INDEX, DeserializeError> deserialize(const Binary &binary, BINARY_INDEX begin) override;
+  friend std::ostream &operator<<(std::ostream &os, const DBPointer &pointer);
+
  private:
   std::string file_name;
   OFFSET offset;
 };
 
-template <typename Key, typename Value>
-class DTO {
- public:
-  IndexNodeUnique<Key, DBPointer> get_index_node(DBPointer db_pointer){
-
-  };
-  DataNodeUnique<Key, DBPointer> get_data_node(DBPointer db_pointer){
-
-  };
-
-};
 
 #endif //CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DB_IO_H_

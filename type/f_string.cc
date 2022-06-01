@@ -8,7 +8,7 @@
 
 String::String() : FieldData(Type::STRING) {}
 
-BinaryUnique String::serialize() {
+BinaryUnique String::serialize() const {
   int str_bits = (int) str.size();
   auto byte_count = byte_count_of_str(str_bits);
   if (byte_count > 15) {
@@ -25,15 +25,15 @@ BinaryUnique String::serialize() {
     b_index++;
   }
 
-  for (int i = 0; i < str.size(); i++) {
-    binary->set_mem(b_index, str[i]);
+  for (char i : str) {
+    binary->set_mem(b_index, i);
     b_index++;
   }
 
   return binary;
 }
 
-Result<BINARY_INDEX, DeserializeError> String::deserialize(Binary &binary, BINARY_INDEX begin) {
+Result<BINARY_INDEX, DeserializeError> String::deserialize(const Binary &binary, BINARY_INDEX begin) {
   unsigned char type = binary.read_mem(begin, Location_in_byte::FirstFourBit);
   unsigned char size_char_count = binary.read_mem(begin, Location_in_byte::SecondFourBit);
   int size = 0;
