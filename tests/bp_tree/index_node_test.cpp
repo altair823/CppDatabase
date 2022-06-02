@@ -18,9 +18,9 @@ TEST(IndexNodeTest, SerializeTest){
   pointers.emplace_back("db2.txt", 3);
   pointers.emplace_back("db3.txt", 126275);
   pointers.emplace_back("db4.txt", 35217175);
-  auto index_node = IndexNode<String>::create(keys, pointers);
+  auto index_node = IndexNodeFactory<String>::create(keys, pointers);
   auto binary = index_node->serialize();
-  auto new_index_node = IndexNode<String>::create();
+  auto new_index_node = IndexNodeFactory<String>::create();
   new_index_node->deserialize(*binary, 0);
 
   ASSERT_EQ(*index_node, *new_index_node);

@@ -10,10 +10,6 @@ TEST(DBPointerTest, SerializeTest){
   db_pointer.serialize();
 }
 
-TEST(DBPointerTest, OffsetTest){
-  std::cout<<sizeof(off_t)<<std::endl;
-}
-
 TEST(DBPointerTest, DeserializeTest){
   DBPointer db_pointer;
 

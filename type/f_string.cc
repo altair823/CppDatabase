@@ -15,10 +15,10 @@ BinaryUnique String::serialize() const {
     return WRONG_BINARY;
   }
   auto binary = BinaryFactory::create(str.size() + 1 + byte_count);
-  binary->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_bits(Type::STRING));
+  binary->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_byte(Type::STRING));
   binary->set_mem(0, Location_in_byte::SecondFourBit, byte_count);
 
-  BINARY_INDEX b_index = 1;
+  BinaryIndex b_index = 1;
   for (int i = 0; i < byte_count; i++) {
     int data = str_bits >> ((byte_count - (i + 1)) * 8);
     binary->set_mem(b_index, (char) data);
@@ -33,11 +33,11 @@ BinaryUnique String::serialize() const {
   return binary;
 }
 
-Result<BINARY_INDEX, DeserializeError> String::deserialize(const Binary &binary, BINARY_INDEX begin) {
-  unsigned char type = binary.read_mem(begin, Location_in_byte::FirstFourBit);
-  unsigned char size_char_count = binary.read_mem(begin, Location_in_byte::SecondFourBit);
+Result<BinaryIndex, DeserializeError> String::deserialize(const Binary &binary, BinaryIndex begin) {
+  Byte type = binary.read_mem(begin, Location_in_byte::FirstFourBit);
+  Byte size_char_count = binary.read_mem(begin, Location_in_byte::SecondFourBit);
   int size = 0;
-  BINARY_INDEX index = begin + 1;
+  BinaryIndex index = begin + 1;
   for (int i = 0; i < size_char_count; i++) {
     size += binary.read_mem(index) << 8 * (size_char_count - (i + 1));
     index++;

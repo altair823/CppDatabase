@@ -7,6 +7,11 @@
 #include <f_datetime.h>
 #include <f_string.h>
 
+TEST(BinaryTest, ByteSizeTest){
+  ASSERT_EQ(sizeof(Byte), 1);
+  ASSERT_EQ(sizeof(BinaryIndex), 8);
+}
+
 TEST(BinaryTest, OperatorTest){
   auto binary1 = DateTime(20, 12, 30, 9, 32, 54).serialize();
   auto binary2 = String("testtesttesttesttesttesttesttest").serialize();

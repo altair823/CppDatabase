@@ -94,9 +94,9 @@ Result<FieldDataShared, CannotConvert> type_to_field(Type type){
 RecordUnique deserialize(Binary &binary, std::vector<std::string> &field_names) {
   auto schema = std::make_unique<Record>();
   int name_index = 0;
-  for (BINARY_INDEX index = 0; index < binary.get_length() && name_index < field_names.size(); ){
-    unsigned char type = binary.read_mem(index, Location_in_byte::FirstFourBit);
-    auto field = type_to_field(bits_to_type(type)).unwrap();
+  for (BinaryIndex index = 0; index < binary.get_length() && name_index < field_names.size(); ){
+    Byte type = binary.read_mem(index, Location_in_byte::FirstFourBit);
+    auto field = type_to_field(byte_to_type(type)).unwrap();
     auto index_before = field->deserialize(binary, index).unwrap();
     index = index_before;
     schema->set_field(field, field_names[name_index++]);

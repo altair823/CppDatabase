@@ -18,7 +18,7 @@ class String : public FieldData {
   String();
   explicit String(std::string str);
   BinaryUnique serialize() const override;
-  Result<BINARY_INDEX, DeserializeError> deserialize(const Binary &binary, BINARY_INDEX begin) override;
+  Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
   [[nodiscard]] int get_total_byte_size() const override;
   [[nodiscard]] std::string get_string() const {return str;}
   void set_string(std::string new_str) {str = std::move(new_str);}

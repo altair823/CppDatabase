@@ -28,8 +28,8 @@ enum class Type {
 
 
 
-unsigned char type_to_4_bits(Type type);
-Type bits_to_type(unsigned char bits);
+Byte type_to_4_byte(Type type);
+Type byte_to_type(Byte bits);
 std::ostream &operator<<(std::ostream &os, const Type &type);
 
 #endif //CPPDATABASE_INCLUDES_TYPE_TYPES_H_

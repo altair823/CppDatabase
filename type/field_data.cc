@@ -19,7 +19,7 @@ FieldData::FieldData(const FieldData &field_data) {
   this->field_type = field_data.field_type;
 }
 
-unsigned char type_to_4_bits(Type type) {
+Byte type_to_4_byte(Type type) {
   switch (type) {
     case Type::NONE:return 0;
     case Type::STRING:return 1;
@@ -35,9 +35,10 @@ unsigned char type_to_4_bits(Type type) {
     case Type::BIT:return 11;
     case Type::BLOB:return 12;
   }
+  return 0;
 }
 
-Type bits_to_type(unsigned char bits) {
+Type byte_to_type(Byte bits) {
   return static_cast<Type>(bits);
 }
 

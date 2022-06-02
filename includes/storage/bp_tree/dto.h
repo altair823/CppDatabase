@@ -15,7 +15,7 @@ class DTO {
   IndexNodeUnique<Key> get_index_node(DBPointer db_pointer){
 
   };
-  DataNodeUnique<Key, DBPointer> get_data_node(DBPointer db_pointer){
+  DataNodeShared<Key, DBPointer> get_data_node(DBPointer db_pointer){
 
   };
 

@@ -11,7 +11,7 @@
 TEST(StringTest, StringBitTest) {
   std::string str =
       "달아 달아 밝은 달아 이태백이 놀던 달아 저기 저기 저달 속에 계수 나무 박혔으니 옥도끼로 찍어내어 금도끼로 다듬어서 초가삼간 집을 짓고 양친 부모 모셔다가 천년 만년 살고지고 천년 만년 살고지고";
-  auto v = std::vector<unsigned char>();
+  auto v = std::vector<Byte>();
   for (char i : str) {
     v.push_back(i);
   }

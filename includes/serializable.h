@@ -12,7 +12,7 @@
 class Serializable {
  public:
   [[nodiscard]] virtual BinaryUnique serialize() const = 0;
-  virtual Result<BINARY_INDEX, DeserializeError> deserialize(const Binary &binary, BINARY_INDEX begin) = 0;
+  virtual Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) = 0;
 };
 
 #endif //CPPDATABASE_INCLUDES_SERIALIZABLE_H_

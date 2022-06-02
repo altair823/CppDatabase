@@ -19,39 +19,39 @@ class DateTime : public FieldData {
   DateTime(int year, char month, char day, char hour, char min, char sec);
 
   [[nodiscard]] BinaryUnique serialize() const override;
-  Result<BINARY_INDEX, DeserializeError> deserialize(const Binary &binary, BINARY_INDEX begin) override;
+  Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
 
-  [[nodiscard]] unsigned char get_year() const {return f_year;}
-  [[nodiscard]] unsigned char get_month() const {return f_month;}
-  [[nodiscard]] unsigned char get_day() const {return f_day;}
-  [[nodiscard]] unsigned char get_hour() const {return f_hour;}
-  [[nodiscard]] unsigned char get_min() const {return f_min;}
-  [[nodiscard]] unsigned char get_sec() const {return f_sec;}
-  void set_year(unsigned char year) {
+  [[nodiscard]] Byte get_year() const {return f_year;}
+  [[nodiscard]] Byte get_month() const {return f_month;}
+  [[nodiscard]] Byte get_day() const {return f_day;}
+  [[nodiscard]] Byte get_hour() const {return f_hour;}
+  [[nodiscard]] Byte get_min() const {return f_min;}
+  [[nodiscard]] Byte get_sec() const {return f_sec;}
+  void set_year(Byte year) {
     DateTime::f_year = year;
   }
-  void set_month(unsigned char month) {
+  void set_month(Byte month) {
     DateTime::f_month = month;
   }
-  void set_day(unsigned char day) {
+  void set_day(Byte day) {
     DateTime::f_day = day;
   }
-  void set_hour(unsigned char hour) {
+  void set_hour(Byte hour) {
     DateTime::f_hour = hour;
   }
-  void set_min(unsigned char min) {
+  void set_min(Byte min) {
     DateTime::f_min = min;
   }
-  void set_sec(unsigned char sec) {
+  void set_sec(Byte sec) {
     DateTime::f_sec = sec;
   }
  private:
-  unsigned char f_year; // 8bits
-  unsigned char f_month; // 4
-  unsigned char f_day; // 8
-  unsigned char f_hour; // 8
-  unsigned char f_min; // 8
-  unsigned char f_sec; // 8
+  Byte f_year; // 8bits
+  Byte f_month; // 4
+  Byte f_day; // 8
+  Byte f_hour; // 8
+  Byte f_min; // 8
+  Byte f_sec; // 8
   [[nodiscard]] bool eq(const FieldData &rhs) const override;
   std::ostream& out(std::ostream& os) const override;
 };

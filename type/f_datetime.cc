@@ -6,7 +6,7 @@
 
 BinaryUnique DateTime::serialize() const {
   auto result = BinaryFactory::create(6);
-  result->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_bits(field_type));
+  result->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_byte(field_type));
   result->set_mem(0, 1, f_year);
   result->set_mem(1, Location_in_byte::SecondFourBit, f_month);
   result->set_mem(2, f_day);
@@ -22,16 +22,16 @@ DateTime::DateTime(int year, char month, char day, char hour, char min, char sec
 : FieldData(Type::DATETIME), f_month(month), f_day(day), f_hour(hour), f_min(min), f_sec(sec) {
   if (year > 99){
     int y = year % 100;
-    f_year = (unsigned char)y;
+    f_year = (Byte)y;
   } else{
     f_year = year;
   }
 }
 
-Result<BINARY_INDEX, DeserializeError> DateTime::deserialize(const Binary &binary, BINARY_INDEX begin) {
-  unsigned char a = 0;
+Result<BinaryIndex, DeserializeError> DateTime::deserialize(const Binary &binary, BinaryIndex begin) {
+  Byte a = 0;
   a = binary.read_mem(begin, Location_in_byte::FirstFourBit);
-  this->field_type = bits_to_type(a);
+  this->field_type = byte_to_type(a);
   this->f_year = binary.read_mem(begin, begin + 1);
   this->f_month = binary.read_mem(begin + 1, Location_in_byte::SecondFourBit);
   this->f_day = binary.read_mem(begin + 2);

@@ -21,11 +21,11 @@ class Error{
 
 class DeserializeError : public Error{
  public:
-  DeserializeError(std::string msg, BINARY_INDEX previous_index)
+  DeserializeError(std::string msg, BinaryIndex previous_index)
   : Error(std::move(msg), "DeserializeError"), previous_index(previous_index) {}
-  [[nodiscard]] BINARY_INDEX get_previous_index() const {return previous_index;}
+  [[nodiscard]] BinaryIndex get_previous_index() const {return previous_index;}
  private:
-  BINARY_INDEX previous_index;
+  BinaryIndex previous_index;
 };
 
 class SerializeError : public Error {
