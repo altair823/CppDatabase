@@ -56,7 +56,7 @@ class Binary{
 };
 #define WRONG_BINARY BinaryFactory::create(0)
 
-int byte_count_of_str(int size);
+int get_byte_count(unsigned long long size);
 std::vector<Byte> num_to_char_vec(unsigned long long int num);
 unsigned long long char_vec_to_num(std::vector<Byte> char_vec);
 int write_str_size_bits(BinaryUnique &binary, int size, int byte_count);

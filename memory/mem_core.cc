@@ -5,7 +5,7 @@
 
 
 
-int byte_count_of_str(int size) {
+int get_byte_count(unsigned long long size) {
   int i = 0;
   while (size > 0) {
     size = size >> 8;

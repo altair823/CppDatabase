@@ -9,10 +9,10 @@
 String::String() : FieldData(Type::STRING) {}
 
 BinaryUnique String::serialize() const {
-  int str_bits = (int) str.size();
-  auto byte_count = byte_count_of_str(str_bits);
+  auto str_size = str.size();
+  auto byte_count = get_byte_count(str_size);
   if (byte_count > 15) {
-    return WRONG_BINARY;
+    throw SerializeError("Too long string!");
   }
   auto binary = BinaryFactory::create(str.size() + 1 + byte_count);
   binary->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_byte(Type::STRING));
@@ -20,7 +20,7 @@ BinaryUnique String::serialize() const {
 
   BinaryIndex b_index = 1;
   for (int i = 0; i < byte_count; i++) {
-    int data = str_bits >> ((byte_count - (i + 1)) * 8);
+    auto data = str_size >> ((byte_count - (i + 1)) * 8);
     binary->set_mem(b_index, (char) data);
     b_index++;
   }
@@ -68,7 +68,7 @@ String::String(std::string str): FieldData(Type::STRING), str(std::move(str)) {}
 
 int String::get_total_byte_size() const {
   int str_size = (int)str.size();
-  auto size_byte_count = byte_count_of_str(str_size);
+  auto size_byte_count = get_byte_count(str_size);
   return str_size + size_byte_count + 1;
 }
 

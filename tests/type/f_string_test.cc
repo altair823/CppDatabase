@@ -26,7 +26,7 @@ TEST(StringTest, StringBitTest) {
   ASSERT_EQ(str, a);
 
   auto str_bit_count = str.size();
-  auto size_bit_count = byte_count_of_str((int) str_bit_count);
+  auto size_bit_count = get_byte_count((int) str_bit_count);
   //std::cout<<str_bit_count<<" "<<size_bit_count<<std::endl;
 
   ASSERT_EQ(str_bit_count, 269);

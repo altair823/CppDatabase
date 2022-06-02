@@ -19,38 +19,34 @@ class Error{
   std::string error_type;
 };
 
-class DeserializeError : public Error{
+class DeserializeError : public std::runtime_error {
  public:
-  DeserializeError(std::string msg, BinaryIndex previous_index)
-  : Error(std::move(msg), "DeserializeError"), previous_index(previous_index) {}
-  [[nodiscard]] BinaryIndex get_previous_index() const {return previous_index;}
- private:
-  BinaryIndex previous_index;
+  explicit DeserializeError(const std::string& msg): runtime_error("DeserializeError: " + msg) {}
 };
 
-class SerializeError : public Error {
+class SerializeError : public std::runtime_error {
  public:
-  explicit SerializeError(std::string msg): Error(std::move(msg), "SerializeError") {}
+  explicit SerializeError(const std::string& msg): runtime_error("SerializeError: " + msg) {}
 };
 
-class AlreadyExist : public Error {
+class AlreadyExist : public std::runtime_error {
  public:
-  explicit AlreadyExist(std::string msg): Error(std::move(msg), "AlreadyExist") {}
+  explicit AlreadyExist(const std::string& msg): runtime_error("AlreadyExist: " + msg) {}
 };
 
-class NotFound : public Error {
+class NotFound : public std::runtime_error {
  public:
-  explicit NotFound(std::string msg): Error(std::move(msg), "NotFound") {}
+  explicit NotFound(const std::string& msg): runtime_error("NotFound: " + msg) {}
 };
 
-class CannotConvert : public Error {
+class CannotConvert : public std::runtime_error {
  public:
-  explicit CannotConvert(std::string msg): Error(std::move(msg), "CannotConvert") {}
+  explicit CannotConvert(const std::string& msg): runtime_error("CannotConvert: " + msg) {}
 };
 
-class InsertionError : public Error {
+class InsertionError : public std::runtime_error {
  public:
-  explicit InsertionError(std::string msg): Error(std::move(msg), "InsertionError") {}
+  explicit InsertionError(const std::string& msg): runtime_error("InsertionError: " + msg) {}
 };
 
 #endif //CPPDATABASE_INCLUDES_TYPE_ERROR_H_

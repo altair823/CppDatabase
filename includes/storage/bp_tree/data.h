@@ -6,6 +6,7 @@
 #define CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DATA_H_
 
 #include <memory>
+#include <serializable.h>
 
 template <typename Key, typename Value>
 class Data;
@@ -25,10 +26,13 @@ DataUnique<Key, Value> DataFactory<Key, Value>::create(Key key, Value value) {
 }
 
 template <typename Key, typename Value>
-class Data {
+class Data : public Serializable{
  public:
   Key get_key() {return key;}
   Value get_value() {return value;}
+
+  [[nodiscard]] BinaryUnique serialize() const override;
+  Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
  private:
   friend class DataFactory<Key, Value>;
   Data(Key key, Value value): key(key), value(value) {}
@@ -36,4 +40,10 @@ class Data {
   Value value;
 };
 
+template<typename Key, typename Value>
+BinaryUnique Data<Key, Value>::serialize() const {
+}
+template<typename Key, typename Value>
+Result<BinaryIndex, DeserializeError> Data<Key, Value>::deserialize(const Binary &binary, BinaryIndex begin) {
+}
 #endif //CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DATA_H_

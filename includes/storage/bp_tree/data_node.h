@@ -89,7 +89,7 @@ BinaryUnique DataNode<Key, Value>::serialize() const {
   BinaryIndex total_size = 2;
 
   for (const auto &d: data){
-    binaries.push_back(d.serialize());
+    binaries.push_back(d->serialize());
     total_size += binaries.back()->get_length();
   }
 

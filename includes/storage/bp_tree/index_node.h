@@ -115,7 +115,7 @@ BinaryUnique IndexNode<Key>::serialize() const {
 template<typename Key>
 Result<BinaryIndex, DeserializeError> IndexNode<Key>::deserialize(const Binary &binary, BinaryIndex begin) {
   if (binary.read_mem(0, Location_in_byte::FirstFourBit) != static_cast<Byte>(NodeType::IndexNode)){
-    return Err(DeserializeError("The binary data is not for index node!", begin));
+    return Err(DeserializeError("The binary data is not for index node!"));
   }
   int degree = (binary.read_mem(0, Location_in_byte::SecondFourBit) << 4) + binary.read_mem(1);
   BinaryIndex index = 2;
