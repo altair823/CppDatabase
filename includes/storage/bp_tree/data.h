@@ -42,6 +42,9 @@ class Data : public Serializable{
 
 template<typename Key, typename Value>
 BinaryUnique Data<Key, Value>::serialize() const {
+//  auto key_binary = key.serialize();
+//  auto value_binary = value.serialize();
+//  return *key_binary + *value_binary;
 }
 template<typename Key, typename Value>
 Result<BinaryIndex, DeserializeError> Data<Key, Value>::deserialize(const Binary &binary, BinaryIndex begin) {

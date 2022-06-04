@@ -25,7 +25,7 @@ Result<BinaryIndex, DeserializeError> DBPointer::deserialize(const Binary &binar
 BinaryUnique DBPointer::serialize() const {
   auto file_name_byte_count = (int) file_name.size();
   if (file_name_byte_count > 225){
-    return WRONG_BINARY;
+    throw SerializeError("Too long file name!");
   }
   auto offset_to_chars = num_to_char_vec(offset);
   bool flag = false;
@@ -37,7 +37,7 @@ BinaryUnique DBPointer::serialize() const {
     }
   }
   if (valid_offset_bytes.size() >= 256){
-    return WRONG_BINARY;
+    throw SerializeError("File is too large!");
   }
   auto offset_byte_count = (Byte)valid_offset_bytes.size();
   auto binary = BinaryFactory::create(1 + file_name_byte_count + 1 + offset_byte_count);

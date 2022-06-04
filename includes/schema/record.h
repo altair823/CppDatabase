@@ -11,6 +11,9 @@
 #include <field_data.h>
 #include <mem_core.h>
 #include <ostream>
+#include <serializable.h>
+
+#include <schema.h>
 
 #include <f_string.h>
 #include <f_datetime.h>
@@ -26,25 +29,26 @@ struct Field{
 
 typedef std::shared_ptr<Field> FieldShared;
 
-class Record{
+class Record : public Serializable{
  public:
-  Record();
+  explicit Record(Schema schema);
 
   Result<bool, AlreadyExist> set_field(std::shared_ptr<FieldData> data, const std::string& field_name);
   [[nodiscard]] Result<FieldShared, NotFound> get_field(const std::string& field_name) const;
-
-  BinaryUnique serialize();
+  Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
+  [[nodiscard]] BinaryUnique serialize() const;
 
   [[nodiscard]] int get_total_byte_size() const;
+  [[nodiscard]] Schema get_schema() const {return schema;}
   friend std::ostream &operator<<(std::ostream &os, const Record &schema);
   bool operator==(const Record &rhs) const;
 
   std::vector<Field> fields;
+  Schema schema;
 };
 
 typedef std::unique_ptr<Record> RecordUnique;
 
 Result<FieldDataShared, CannotConvert> type_to_field(Type type);
-RecordUnique deserialize(Binary &binary, std::vector<std::string> &field_names);
 
 #endif //CPPDATABASE_INCLUDES_SCHEMA_RECORD_H_

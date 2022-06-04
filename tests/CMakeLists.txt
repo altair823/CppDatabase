@@ -29,7 +29,7 @@ add_executable(
         bp_tree/db_io_test.cc
         bp_tree/bp_tree_test.cpp
         bp_tree/index_node_test.cpp
-        bp_tree/data_node_test.cpp)
+        bp_tree/data_node_test.cpp bp_tree/data_test.cpp)
 target_link_libraries(
         test
         gtest_main

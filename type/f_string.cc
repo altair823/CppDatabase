@@ -66,7 +66,7 @@ bool String::eq(const FieldData &rhs) const {
 
 String::String(std::string str): FieldData(Type::STRING), str(std::move(str)) {}
 
-int String::get_total_byte_size() const {
+BinaryIndex String::get_total_byte_size() const {
   int str_size = (int)str.size();
   auto size_byte_count = get_byte_count(str_size);
   return str_size + size_byte_count + 1;

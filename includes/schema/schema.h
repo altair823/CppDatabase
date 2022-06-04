@@ -11,7 +11,6 @@
 #include <memory>
 #include <ostream>
 #include <algorithm>
-#include "record.h"
 
 enum class KeyType{
   PK,
@@ -26,24 +25,54 @@ struct FieldSchema{
     os << "type: " << schema.type << " name: " << schema.name;
     return os;
   }
+  bool operator==(const FieldSchema &rhs) const {
+    return type == rhs.type &&
+        name == rhs.name;
+  }
+  bool operator!=(const FieldSchema &rhs) const {
+    return !(rhs == *this);
+  }
 
   FieldSchema(Type type, std::string name): type(type), name(std::move(name)) {}
 };
 class Schema;
 typedef std::shared_ptr<Schema> SchemaShared;
-typedef Schema* SchemaPtr;
 
 class Schema {
  public:
+  explicit Schema(std::string schema_name);
+
   std::string schema_name;
   std::string pk_name;
   std::vector<std::string> fk_names;
   std::vector<FieldSchema> fields;
 
-  explicit Schema(std::string schema_name);
-  bool verify_record(Record* record);
-
   friend std::ostream &operator<<(std::ostream &os, const Schema &schema);
+  bool operator==(const Schema &rhs) const;
+  bool operator!=(const Schema &rhs) const;
+
+  using iterator = std::vector<FieldSchema>::iterator;
+  using const_iterator = std::vector<FieldSchema>::const_iterator;
+
+  iterator begin()
+  {
+    return fields.begin();
+  }
+
+  iterator end()
+  {
+    return fields.end();
+  }
+
+  [[nodiscard]] const_iterator cbegin() const
+  {
+    return fields.cbegin();
+  }
+
+  [[nodiscard]] const_iterator cend() const
+  {
+    return fields.cend();
+  }
 };
 
 class SchemaBuilder;
@@ -51,14 +80,15 @@ typedef SchemaBuilder* SchemaBuilderPtr;
 
 class SchemaBuilder {
  public:
+  explicit SchemaBuilder(std::string schema_name);
+  Result<SchemaBuilder*, AlreadyExist> set_field(Type type, const std::string& name, KeyType key_type = KeyType::NONE);
+  Result<SchemaShared, NotFound> build();
+
+ private:
   std::string schema_name;
   std::string pk_name;
   std::vector<std::string> fk_names;
   std::vector<FieldSchema> fields;
-
-  explicit SchemaBuilder(std::string schema_name);
-  Result<SchemaBuilder*, AlreadyExist> set_field(Type type, const std::string& name, KeyType key_type = KeyType::NONE);
-  Result<SchemaShared, NotFound> build();
 };
 
 

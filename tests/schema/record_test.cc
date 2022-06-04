@@ -11,7 +11,11 @@
 #include "test_util.h"
 
 TEST(RecordTest, SetFieldTest){
-  Record record;
+  SchemaBuilder schema_builder("test schema1");
+  auto schema = schema_builder.set_field(Type::DATETIME, "Created date").unwrap()
+      ->set_field(Type::STRING, "string", KeyType::PK).unwrap()
+      ->build().unwrap();
+  Record record(*schema);
   record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date");
   // std::cout<<*schema.fields[0].type<<std::endl;
 
@@ -29,7 +33,11 @@ TEST(RecordTest, SetFieldTest){
 }
 
 TEST(RecordTest, GetFieldTest){
-  Record record;
+  SchemaBuilder schema_builder("test schema2");
+  auto schema = schema_builder.set_field(Type::DATETIME, "Created date").unwrap()
+      ->set_field(Type::STRING, "File name", KeyType::PK).unwrap()
+      ->build().unwrap();
+  Record record(*schema);
   record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date");
   record.set_field(std::make_shared<String>("this is string type variable. 이것은 문자열 타입 변수입니다."), "File name");
 
@@ -46,7 +54,15 @@ TEST(RecordTest, GetFieldTest){
 }
 
 TEST(RecordTest, VectoredTest){
-  std::vector<Record> records(3);
+  SchemaBuilder schema_builder("test schema3");
+  auto schema = schema_builder.set_field(Type::DATETIME, "Created date").unwrap()
+      ->set_field(Type::DATETIME, "Edited date").unwrap()
+      ->set_field(Type::STRING, "File name", KeyType::PK).unwrap()
+      ->build().unwrap();
+  std::vector<Record> records;
+  for (int i = 0; i < 3; i++){
+    records.emplace_back(*schema);
+  }
   for (auto& s: records){
     s.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date");
     s.set_field(std::make_shared<DateTime>(2022, 6, 2, 20, 39, 10), "Edited date");
@@ -55,7 +71,7 @@ TEST(RecordTest, VectoredTest){
 //  for (auto &s: schemas){
 //    std::cout<<s<<std::endl;
 //  }
-  Record exp_record;
+  Record exp_record(*schema);
   exp_record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date");
   exp_record.set_field(std::make_shared<DateTime>(2022, 6, 2, 20, 39, 10), "Edited date");
   exp_record.set_field(std::make_shared<String>("this is string type variable. 이것은 문자열 타입 변수입니다."), "File name");
@@ -70,7 +86,13 @@ TEST(RecordTest, DeserializeTest){
   field_names.emplace_back("Edited date");
   field_names.emplace_back("File name");
 
-  Record record;
+  SchemaBuilder schema_builder("test schema4");
+  auto schema = schema_builder.set_field(Type::DATETIME, field_names[0]).unwrap()
+      ->set_field(Type::DATETIME, field_names[1]).unwrap()
+      ->set_field(Type::STRING, field_names[2], KeyType::PK).unwrap()
+      ->build().unwrap();
+
+  Record record(*schema);
   record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), field_names[0]);
   record.set_field(std::make_shared<DateTime>(2022, 6, 2, 20, 39, 10), field_names[1]);
   record.set_field(std::make_shared<String>("this is string type variable. 이것은 문자열 타입 변수입니다."), field_names[2]);
@@ -82,8 +104,9 @@ TEST(RecordTest, DeserializeTest){
   //print_bits(b);
 
 
-  RecordUnique record_unique = deserialize(*b, field_names);
+  Record deserialized_record(*schema);
+  deserialized_record.deserialize(*b, 0);
   //std::cout<<*schema_unique<<std::endl;
 
-  ASSERT_EQ(record, *record_unique);
+  ASSERT_EQ(record, deserialized_record);
 }

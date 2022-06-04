@@ -25,16 +25,14 @@ std::ostream &operator<<(std::ostream &os, const Schema &schema) {
   }
   return os;
 }
-bool Schema::verify_record(Record* record) {
-  if (record->fields.size() != this->fields.size()){
-    return false;
-  }
-  for (int i = 0; i < fields.size(); i++){
-    if (fields[i].type != record->fields[i].data->field_type || fields[i].name != record->fields[i].name){
-      return false;
-    }
-  }
-  return true;
+bool Schema::operator==(const Schema &rhs) const {
+  return schema_name == rhs.schema_name &&
+      pk_name == rhs.pk_name &&
+      fk_names == rhs.fk_names &&
+      fields == rhs.fields;
+}
+bool Schema::operator!=(const Schema &rhs) const {
+  return !(rhs == *this);
 }
 SchemaBuilder::SchemaBuilder(std::string schema_name): schema_name(std::move(schema_name)) {}
 

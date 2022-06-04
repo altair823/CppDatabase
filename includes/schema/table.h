@@ -8,38 +8,38 @@
 #include <schema.h>
 #include <storage_interface.h>
 #include <ostream>
+#include <record.h>
 
-template <typename Key, typename Value>
 class Table{
  public:
-  Table(SchemaShared schema, StorageShared<Key, Value> storage);
-  Result<bool, InsertionError> add_record(Value record);
+  Table(SchemaShared schema, StorageShared<Field, Record> storage);
+  Result<bool, InsertionError> add_record(const Record& record);
 
 
   SchemaShared schema;
-  friend std::ostream &operator<<(std::ostream &os, const Table<Key, Value> &table);
-  StorageShared<Key, RecordUnique> storage;
+  friend std::ostream &operator<<(std::ostream &os, const Table &table);
+  StorageShared<Field, Record> storage;
  private:
 };
-template<typename Key, typename Value>
-Table<Key, Value>::Table(SchemaShared schema, StorageShared<Key, Value> storage)
+
+
+Table::Table(SchemaShared schema, StorageShared<Field, Record> storage)
 : schema(std::move(schema)), storage(std::move(storage)){
 
 }
-template<typename Key, typename Value>
-Result<bool, InsertionError> Table<Key, Value>::add_record(Value record) {
-  if (!schema->verify_record(record.get())){
+
+Result<bool, InsertionError> Table::add_record(const Record& record){
+  if (*schema != record.get_schema()){
     return Err(InsertionError("The record does not match with schema!"));
   }
-  auto key = record->get_field(schema->pk_name).unwrap()->data;
-  if (!storage->insert(key, std::move(record), false)){
+  auto key = record.get_field(schema->pk_name).unwrap();
+  if (!storage->insert(*key, record, false)){
     return Err(InsertionError("Cannot insert record in the storage!"));
   }
   return Ok(true);
 }
 
-template<typename Key, typename Value>
-std::ostream &operator<<(std::ostream &os, const Table<Key, Value> &table) {
+std::ostream &operator<<(std::ostream &os, const Table &table) {
   os << "schema: " << table.schema << " storage: " << table.storage;
   return os;
 }

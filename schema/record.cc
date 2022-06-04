@@ -6,7 +6,9 @@
 
 #include <utility>
 
-Record::Record() = default;
+Record::Record(Schema schema): schema(std::move(schema)) {
+
+}
 
 Result<bool, AlreadyExist> Record::set_field(std::shared_ptr<FieldData> data, const std::string& field_name) {
   for (const auto& f: fields){
@@ -56,7 +58,7 @@ int Record::get_total_byte_size() const {
   return total_byte_size;
 }
 
-BinaryUnique Record::serialize() {
+BinaryUnique Record::serialize() const {
   int total_size = get_total_byte_size();
   auto binary = BinaryFactory::create(total_size);
   int index = 0;
@@ -69,6 +71,20 @@ BinaryUnique Record::serialize() {
     }
   }
   return binary;
+}
+
+Result<BinaryIndex, DeserializeError> Record::deserialize(const Binary &binary, BinaryIndex begin) {
+  BinaryIndex index = 0;
+  for (auto &field_schema: schema){
+    auto type = byte_to_type(binary.read_mem(index, Location_in_byte::FirstFourBit));
+    if (type != field_schema.type){
+      throw DeserializeError("Wrong binary! (maybe mismatched with schema)");
+    }
+    auto field = type_to_field(type).unwrap();
+    index = field->deserialize(binary, index).unwrap();
+    fields.emplace_back(field, field_schema.name);
+  }
+  return Ok(index);
 }
 
 Result<FieldDataShared, CannotConvert> type_to_field(Type type){
@@ -89,17 +105,4 @@ Result<FieldDataShared, CannotConvert> type_to_field(Type type){
     default: return Err(CannotConvert("Wrong type error!"));
   }
   return Err(CannotConvert("Wrong type error!"));
-}
-
-RecordUnique deserialize(Binary &binary, std::vector<std::string> &field_names) {
-  auto schema = std::make_unique<Record>();
-  int name_index = 0;
-  for (BinaryIndex index = 0; index < binary.get_length() && name_index < field_names.size(); ){
-    Byte type = binary.read_mem(index, Location_in_byte::FirstFourBit);
-    auto field = type_to_field(byte_to_type(type)).unwrap();
-    auto index_before = field->deserialize(binary, index).unwrap();
-    index = index_before;
-    schema->set_field(field, field_names[name_index++]);
-  }
-  return schema;
 }

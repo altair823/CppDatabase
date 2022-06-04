@@ -21,7 +21,7 @@ class FieldData : public Serializable{
   FieldData(const FieldData& field_data);
   virtual ~FieldData() = default;
   explicit FieldData(Type field_type);
-  [[nodiscard]] virtual int get_total_byte_size() const = 0;
+  [[nodiscard]] virtual BinaryIndex get_total_byte_size() const = 0;
 
   bool operator==(const FieldData &rhs) const;
   friend std::ostream &operator<<(std::ostream &os, const FieldData &field_type);

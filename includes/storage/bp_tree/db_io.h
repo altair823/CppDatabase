@@ -29,7 +29,6 @@ class DBPointer : public Serializable{
   bool operator==(const DBPointer &rhs) const;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
   friend std::ostream &operator<<(std::ostream &os, const DBPointer &pointer);
-
  private:
   std::string file_name;
   OFFSET offset;

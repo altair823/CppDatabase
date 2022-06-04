@@ -13,7 +13,7 @@
 
 class DateTime : public FieldData {
  public:
-  [[nodiscard]] int get_total_byte_size() const override;
+  [[nodiscard]] BinaryIndex get_total_byte_size() const override;
 
   DateTime();
   DateTime(int year, char month, char day, char hour, char min, char sec);

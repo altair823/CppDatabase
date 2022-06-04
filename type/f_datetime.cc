@@ -59,7 +59,7 @@ bool DateTime::eq(const FieldData &rhs) const {
       f_min == rh.f_min &&
       f_sec == rh.f_sec;
 }
-int DateTime::get_total_byte_size() const {
+BinaryIndex DateTime::get_total_byte_size() const {
   return 6;
 }
 
