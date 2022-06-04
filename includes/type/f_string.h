@@ -17,6 +17,7 @@ class String : public FieldData {
 
   String();
   explicit String(std::string str);
+  ~String() override = default;
   [[nodiscard]] BinaryUnique serialize() const override;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
   [[nodiscard]] BinaryIndex get_total_byte_size() const override;
@@ -26,6 +27,7 @@ class String : public FieldData {
  private:
   std::string str;
   [[nodiscard]] bool eq(const FieldData &field_type) const override;
+  [[nodiscard]] bool under(const FieldData &rhs) const override;
   std::ostream& out(std::ostream& os) const override;
 };
 

@@ -74,4 +74,10 @@ BinaryIndex String::get_total_byte_size() const {
   auto size_byte_count = get_byte_count(str_size);
   return str_size + size_byte_count + 1;
 }
+bool String::under(const FieldData &rhs) const {
+  if (rhs.field_type != Type::STRING){
+    throw CannotConvert("rhs is not String!");
+  }
+  return str < dynamic_cast<const String&>(rhs).str;
+}
 

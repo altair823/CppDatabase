@@ -63,4 +63,36 @@ bool DateTime::eq(const FieldData &rhs) const {
 BinaryIndex DateTime::get_total_byte_size() const {
   return 6;
 }
+bool DateTime::under(const FieldData &rhs) const {
+  if (rhs.field_type != Type::DATETIME){
+    throw CannotConvert("rhs is not Datetime!");
+  }
+  auto r = dynamic_cast<const DateTime&>(rhs);
+  if (f_year >= r.f_year){
+    return false;
+  } else if (f_year == r.f_year) {
+    if (f_month >= r.f_month) {
+      return false;
+    } else if (f_month == r.f_month) {
+      if (f_day >= r.f_day) {
+        return false;
+      } else if (f_day == r.f_day) {
+        if (f_hour >= r.f_hour) {
+          return false;
+        } else if (f_hour == r.f_hour) {
+          if (f_min >= r.f_min) {
+            return false;
+          } else if (f_min == r.f_min) {
+            if (f_sec < r.f_sec) {
+              return true;
+            } else{
+              return false;
+            }
+          }
+        }
+      }
+    }
+  }
+  return true;
+}
 

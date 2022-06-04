@@ -18,3 +18,15 @@ bool FieldData::operator==(const FieldData &rhs) const {
 FieldData::FieldData(const FieldData &field_data) {
   this->field_type = field_data.field_type;
 }
+bool FieldData::operator<(const FieldData &rhs) const {
+  return under(rhs);
+}
+bool FieldData::operator>(const FieldData &rhs) const {
+  return rhs.under(*this);
+}
+bool FieldData::operator<=(const FieldData &rhs) const {
+  return !(rhs < *this);
+}
+bool FieldData::operator>=(const FieldData &rhs) const {
+  return !(*this < rhs);
+}

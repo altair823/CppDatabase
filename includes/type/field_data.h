@@ -24,11 +24,17 @@ class FieldData : public Serializable{
   [[nodiscard]] virtual BinaryIndex get_total_byte_size() const = 0;
 
   bool operator==(const FieldData &rhs) const;
+  bool operator<(const FieldData &rhs) const;
+  bool operator>(const FieldData &rhs) const;
+  bool operator<=(const FieldData &rhs) const;
+  bool operator>=(const FieldData &rhs) const;
+
   friend std::ostream &operator<<(std::ostream &os, const FieldData &field_type);
 
   Type field_type;
  private:
   [[nodiscard]] virtual bool eq(const FieldData &rhs) const = 0;
+  [[nodiscard]] virtual bool under(const FieldData &rhs) const = 0;
   virtual std::ostream& out(std::ostream&) const = 0;
 };
 

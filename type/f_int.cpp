@@ -51,3 +51,9 @@ std::ostream &Int::out(std::ostream &ostream) const {
   ostream << "field_type: " << this->field_type << " value: " << this->value;
   return ostream;
 }
+bool Int::under(const FieldData &rhs) const {
+  if (rhs.field_type != Type::INT){
+    throw CannotConvert("rhs is not Int!");
+  }
+  return value < dynamic_cast<const Int&>(rhs).value;
+}

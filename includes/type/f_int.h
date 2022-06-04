@@ -14,9 +14,11 @@ class Int : public FieldData {
   explicit Int(int i): value(i), FieldData(Type::INT) {}
   ~Int() override = default;
   [[nodiscard]] BinaryUnique serialize() const override;
+ private:
+  bool under(const FieldData &rhs) const override;
+ public:
   [[nodiscard]] BinaryIndex get_total_byte_size() const override;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
-
  private:
   [[nodiscard]] bool eq(const FieldData &rhs) const override;
   std::ostream &out(std::ostream &ostream) const override;

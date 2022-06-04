@@ -17,6 +17,7 @@ class DateTime : public FieldData {
 
   DateTime();
   DateTime(int year, char month, char day, char hour, char min, char sec);
+  ~DateTime() override = default;
 
   [[nodiscard]] BinaryUnique serialize() const override;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
@@ -53,6 +54,7 @@ class DateTime : public FieldData {
   Byte f_min; // 8
   Byte f_sec; // 8
   [[nodiscard]] bool eq(const FieldData &rhs) const override;
+  [[nodiscard]] bool under(const FieldData &rhs) const override;
   std::ostream& out(std::ostream& os) const override;
 };
 
