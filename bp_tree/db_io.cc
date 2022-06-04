@@ -19,7 +19,7 @@ Result<BinaryIndex, DeserializeError> DBPointer::deserialize(const Binary &binar
     valid_offset_bytes.push_back(binary.read_mem(index));
     index++;
   }
-  this->offset = char_vec_to_num(valid_offset_bytes);
+  this->offset = byte_vec_to_num(valid_offset_bytes);
   return Ok(index);
 }
 BinaryUnique DBPointer::serialize() const {

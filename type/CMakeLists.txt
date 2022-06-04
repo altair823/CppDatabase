@@ -3,7 +3,7 @@ add_library(
         field_data.cc
         f_datetime.cc
         f_string.cc
-)
+        ../includes/type/f_int.h f_int.cpp types.cpp)
 
 target_include_directories(
         type

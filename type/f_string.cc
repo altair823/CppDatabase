@@ -34,7 +34,10 @@ BinaryUnique String::serialize() const {
 }
 
 Result<BinaryIndex, DeserializeError> String::deserialize(const Binary &binary, BinaryIndex begin) {
-  Byte type = binary.read_mem(begin, Location_in_byte::FirstFourBit);
+  auto type = byte_to_type(binary.read_mem(begin, Location_in_byte::FirstFourBit));
+  if (type != field_type){
+    return Err(DeserializeError("Wrong type of binary!"));
+  }
   Byte size_char_count = binary.read_mem(begin, Location_in_byte::SecondFourBit);
   int size = 0;
   BinaryIndex index = begin + 1;

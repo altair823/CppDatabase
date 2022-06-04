@@ -5,6 +5,8 @@
 #ifndef CPPDATABASE_INCLUDES_TYPE_TYPES_H_
 #define CPPDATABASE_INCLUDES_TYPE_TYPES_H_
 
+#include <mem_core.h>
+
 /**
  * Type of fields in DB schema.
  * The current number of types is up to 16.

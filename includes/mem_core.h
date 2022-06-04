@@ -14,7 +14,10 @@
 
 using BinaryIndex = unsigned long long int ;
 using Byte = std::uint8_t;
-
+using int8 = std::int8_t; // char
+using int16 = std::int16_t; // short
+using int32 = std::int32_t; // int
+using int64 = std::int64_t; // long
 
 enum class Location_in_byte {
   FirstFourBit,
@@ -58,7 +61,7 @@ class Binary{
 
 int get_byte_count(unsigned long long size);
 std::vector<Byte> num_to_char_vec(unsigned long long int num);
-unsigned long long char_vec_to_num(std::vector<Byte> char_vec);
+unsigned long long byte_vec_to_num(std::vector<Byte> char_vec);
 int write_str_size_bits(BinaryUnique &binary, int size, int byte_count);
 
 #endif //CPPDATABASE_DATACORE_H

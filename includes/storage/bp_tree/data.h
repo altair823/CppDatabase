@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <serializable.h>
+#include <type_traits>
 
 template <typename Key, typename Value>
 class Data;
@@ -25,8 +26,21 @@ DataUnique<Key, Value> DataFactory<Key, Value>::create(Key key, Value value) {
   return new_data;
 }
 
+struct can_serialize_impl {
+  template <typename Key, typename Value,
+  typename k_s = decltype(std::declval<Key>().serialize()),
+  typename v_s = decltype(std::declval<Value>().serialize())>
+      static std::true_type test(int);
+  template<typename ...>
+    static std::false_type test(...);
+  };
+
+template <typename Key, typename Value>
+struct can_serialize : decltype(can_serialize_impl::test<Key, Value>(0)) {};
+
 template <typename Key, typename Value>
 class Data : public Serializable{
+  static_assert(can_serialize<Key, Value>::value, "Key and Value should be serializable!");
  public:
   Key get_key() {return key;}
   Value get_value() {return value;}
@@ -42,9 +56,9 @@ class Data : public Serializable{
 
 template<typename Key, typename Value>
 BinaryUnique Data<Key, Value>::serialize() const {
-//  auto key_binary = key.serialize();
-//  auto value_binary = value.serialize();
-//  return *key_binary + *value_binary;
+  auto key_binary = key.serialize();
+  auto value_binary = value.serialize();
+  return *key_binary + *value_binary;
 }
 template<typename Key, typename Value>
 Result<BinaryIndex, DeserializeError> Data<Key, Value>::deserialize(const Binary &binary, BinaryIndex begin) {

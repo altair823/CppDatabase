@@ -29,9 +29,10 @@ DateTime::DateTime(int year, char month, char day, char hour, char min, char sec
 }
 
 Result<BinaryIndex, DeserializeError> DateTime::deserialize(const Binary &binary, BinaryIndex begin) {
-  Byte a = 0;
-  a = binary.read_mem(begin, Location_in_byte::FirstFourBit);
-  this->field_type = byte_to_type(a);
+  auto type = byte_to_type(binary.read_mem(begin, Location_in_byte::FirstFourBit));
+  if (type != field_type){
+    return Err(DeserializeError("Wrong type of binary!"));
+  }
   this->f_year = binary.read_mem(begin, begin + 1);
   this->f_month = binary.read_mem(begin + 1, Location_in_byte::SecondFourBit);
   this->f_day = binary.read_mem(begin + 2);

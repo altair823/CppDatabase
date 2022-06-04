@@ -35,7 +35,7 @@ std::vector<Byte> num_to_char_vec(unsigned long long int num){
   return result;
 }
 
-unsigned long long char_vec_to_num(std::vector<Byte> char_vec) {
+unsigned long long byte_vec_to_num(std::vector<Byte> char_vec) {
   int start_index = -1;
   for (auto i = 0; i < (int)char_vec.size(); i++){
     if (char_vec[i] != 0){
