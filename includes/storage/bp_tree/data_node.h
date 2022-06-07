@@ -24,6 +24,7 @@ class DataNodeFactory {
  public:
   static DataNodeShared<Key, Value> create();
 };
+
 template <typename Key, typename Value>
 class DataNode : public Serializable{
  public:
@@ -32,13 +33,13 @@ class DataNode : public Serializable{
   DataUnique<Key, Value> pop_data(int index) {return data[index];}
   [[nodiscard]] int get_data_count() const {return data.size();}
 
-//  void set_left_sibling(DataNodeShared<Key, Value> data_node) {left = data_node;};
-//  void set_right_sibling(DataNodeShared<Key, Value> data_node) {right = data_node;};
-//  DataNodeShared<Key, Value> get_left_sibling() const {return left;}
-//  DataNodeShared<Key, Value> get_right_sibling() const {return right;}
+  void set_left_sibling(DataNodeShared<Key, Value> data_node) {left = data_node;};
+  void set_right_sibling(DataNodeShared<Key, Value> data_node) {right = data_node;};
+  DataNodeShared<Key, Value> get_left_sibling() const {return left;}
+  DataNodeShared<Key, Value> get_right_sibling() const {return right;}
 
-  int begin() {return 0;}
-  int end() {return data.size() - 1;}
+  int in_begin() {return 0;}
+  int in_end() {return data.size() - 1;}
 
   Result<void, InsertionError> insert(int index, DataUnique<Key, Value> new_data);
   Result<void, InsertionError> push_back(DataUnique<Key, Value> new_data);
@@ -46,6 +47,9 @@ class DataNode : public Serializable{
 
   [[nodiscard]] BinaryUnique serialize() const override;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
+
+  bool operator==(const DataNode &rhs) const;
+  bool operator!=(const DataNode &rhs) const;
 
  private:
   friend class DataNodeFactory<Key, Value>;
@@ -109,5 +113,36 @@ BinaryUnique DataNode<Key, Value>::serialize() const {
 }
 template<typename Key, typename Value>
 Result<BinaryIndex, DeserializeError> DataNode<Key, Value>::deserialize(const Binary &binary, BinaryIndex begin) {
+  BinaryIndex index = begin;
+  if (byte_to_node_type(binary.read_mem(index, Location_in_byte::FirstFourBit)) != NodeType::DataNode){
+    return Err(DeserializeError("Wrong binary(this binary may not be for DataNode)!"));
+  }
+  std::vector<unsigned char> data_count_vec;
+  data_count_vec.push_back(binary.read_mem(index, Location_in_byte::SecondFourBit));
+  index++;
+  data_count_vec.push_back(binary.read_mem(index));
+  index++;
+  int data_count = (int)byte_vec_to_num(data_count_vec);
+  for (int i = 0; i < data_count; i++){
+    //data.push_back(DataFactory<Key, Value>::create());
+  }
+}
+template<typename Key, typename Value>
+bool DataNode<Key, Value>::operator==(const DataNode &rhs) const {
+  if (left != rhs.left || right != rhs.right || data.size() != rhs.data.size()){
+    return false;
+  } else {
+    for (int i = 0; i < data.size(); i++){
+      if (*data[i] != *rhs.data[i]){
+        return false;
+      }
+    }
+  }
+  return left == rhs.left  &&
+      data == rhs.data;
+}
+template<typename Key, typename Value>
+bool DataNode<Key, Value>::operator!=(const DataNode &rhs) const {
+  return !(rhs == *this);
 }
 #endif //CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DATA_NODE_H_

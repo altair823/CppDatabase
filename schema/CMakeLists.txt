@@ -2,7 +2,7 @@ add_library(
         schema
         record.cc
         schema.cc
-)
+        ../includes/schema/field.h field.cpp)
 
 target_include_directories(
         schema

@@ -27,6 +27,7 @@ class DBPointer : public Serializable{
   DBPointer(std::string file, OFFSET offset) : file_name(std::move(file)), offset(offset) {}
   [[nodiscard]] BinaryUnique serialize() const override;
   bool operator==(const DBPointer &rhs) const;
+  bool operator!=(const DBPointer &rhs) const;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
   friend std::ostream &operator<<(std::ostream &os, const DBPointer &pointer);
  private:
@@ -34,5 +35,6 @@ class DBPointer : public Serializable{
   OFFSET offset;
 };
 
+NodeType byte_to_node_type(Byte byte);
 
 #endif //CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DB_IO_H_

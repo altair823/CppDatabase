@@ -5,22 +5,19 @@
 #ifndef CPPDATABASE_INCLUDES_TYPE_F_INT_H_
 #define CPPDATABASE_INCLUDES_TYPE_F_INT_H_
 
-#include <field_data.h>
+#include <type.h>
 #include <mem_core.h>
 
-class Int : public FieldData {
+class Int : public Type {
  public:
-  Int(): value(0), FieldData(Type::INT) {}
-  explicit Int(int i): value(i), FieldData(Type::INT) {}
+  Int(): value(0), Type(TypeKind::INT) {}
+  explicit Int(int i): value(i), Type(TypeKind::INT) {}
   ~Int() override = default;
   [[nodiscard]] BinaryUnique serialize() const override;
- private:
-  bool under(const FieldData &rhs) const override;
- public:
-  [[nodiscard]] BinaryIndex get_total_byte_size() const override;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
  private:
-  [[nodiscard]] bool eq(const FieldData &rhs) const override;
+  [[nodiscard]] bool eq(const Type &rhs) const override;
+  [[nodiscard]] bool under(const Type &rhs) const override;
   std::ostream &out(std::ostream &ostream) const override;
 
   int32 value;

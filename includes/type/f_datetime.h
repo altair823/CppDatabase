@@ -7,13 +7,12 @@
 
 #include <bitset>
 #include <mem_core.h>
-#include <field_data.h>
+#include <type.h>
 #include <ostream>
 #include <iostream>
 
-class DateTime : public FieldData {
+class DateTime : public Type {
  public:
-  [[nodiscard]] BinaryIndex get_total_byte_size() const override;
 
   DateTime();
   DateTime(int year, char month, char day, char hour, char min, char sec);
@@ -53,8 +52,8 @@ class DateTime : public FieldData {
   Byte f_hour; // 8
   Byte f_min; // 8
   Byte f_sec; // 8
-  [[nodiscard]] bool eq(const FieldData &rhs) const override;
-  [[nodiscard]] bool under(const FieldData &rhs) const override;
+  [[nodiscard]] bool eq(const Type &rhs) const override;
+  [[nodiscard]] bool under(const Type &rhs) const override;
   std::ostream& out(std::ostream& os) const override;
 };
 

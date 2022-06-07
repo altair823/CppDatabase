@@ -1,9 +1,9 @@
 add_library(
         type
-        field_data.cc
+        type.cc
         f_datetime.cc
         f_string.cc
-        ../includes/type/f_int.h f_int.cpp types.cpp)
+        ../includes/type/f_int.h f_int.cpp)
 
 target_include_directories(
         type

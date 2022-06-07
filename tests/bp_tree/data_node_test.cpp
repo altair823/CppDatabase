@@ -40,3 +40,23 @@ TEST(DataNodeTest, SearchTest){
   ASSERT_EQ(data_node->search(Int(5)), 3);
   ASSERT_EQ(data_node->search(Int(6)), 4);
 }
+
+TEST(DataNodeTest, SerializeTest){
+
+  auto data1 = DataFactory<Int, Int>::create(Int(1), Int(1));
+  auto data2 = DataFactory<Int, Int>::create(Int(2), Int(2));
+  auto data3 = DataFactory<Int, Int>::create(Int(3), Int(3));
+  auto data4 = DataFactory<Int, Int>::create(Int(4), Int(4));
+  auto data_node = DataNodeFactory<Int, Int>::create();
+  data_node->push_back(std::move(data1));
+  data_node->push_back(std::move(data2));
+  data_node->push_back(std::move(data3));
+  data_node->push_back(std::move(data4));
+
+  auto binary = data_node->serialize();
+
+  auto new_data_node = DataNodeFactory<Int, Int>::create();
+  //new_data_node->deserialize(*binary, 0);
+
+ // ASSERT_EQ(*data_node, *new_data_node);
+}

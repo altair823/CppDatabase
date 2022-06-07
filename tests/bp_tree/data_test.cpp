@@ -7,16 +7,24 @@
 #include <f_string.h>
 #include <f_datetime.h>
 #include <record.h>
+#include "type.h"
 
 TEST(DataTest, SerializeTest){
   SchemaBuilder schema_builder("test schema");
-  auto schema = schema_builder.set_field(Type::STRING, "pk", KeyType::PK).unwrap()
-      ->set_field(Type::STRING, "fk", KeyType::FK).unwrap()
-      ->set_field(Type::DATETIME, "Created date").unwrap()
+  auto schema = schema_builder.set_field(TypeKind::STRING, "pk_str", KeyType::PK).unwrap()
+      ->set_field(TypeKind::STRING, "fk_str", KeyType::FK).unwrap()
+      ->set_field(TypeKind::DATETIME, "Created date").unwrap()
       ->build().unwrap();
-  Record value(*schema);
-  value.set_field(std::make_shared<String>("key1"), "pk");
-  value.set_field(std::make_shared<String>("key2"), "fk");
-  value.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date");
-  //auto data = DataFactory<Field, Record>::create(value.get_field("pk").unwrap()->data, value);
+
+  Record record(*schema);
+  record.set_field(std::make_shared<String>("key1"), "pk_str");
+  record.set_field(std::make_shared<String>("key2"), "fk_str");
+  record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date");
+
+  auto data = DataFactory<Field, Record>::create(*record.get_field("pk_str").unwrap(), record);
+  auto data_binary = data->serialize();
+  auto new_data = DataFactory<Field, Record>::create(Field(), Record(*schema));
+  //new_data->deserialize(*data_binary, 0).unwrap();
+  //std::cout<<*new_data;
+  ASSERT_EQ(*new_data, *data);
 }

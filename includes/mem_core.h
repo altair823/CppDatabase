@@ -33,7 +33,7 @@ class BinaryFactory {
   static BinaryUnique create(BinaryIndex length);
 };
 
-class Binary{
+class [[nodiscard]] Binary{
  public:
   [[nodiscard]] BinaryIndex get_length() const{return length;}
 

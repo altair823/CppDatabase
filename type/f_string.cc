@@ -5,8 +5,9 @@
 #include <f_string.h>
 
 #include <utility>
+#include "type.h"
 
-String::String() : FieldData(Type::STRING) {}
+String::String() : Type(TypeKind::STRING) {}
 
 BinaryUnique String::serialize() const {
   auto str_size = str.size();
@@ -15,7 +16,7 @@ BinaryUnique String::serialize() const {
     throw SerializeError("Too long string!");
   }
   auto binary = BinaryFactory::create(str.size() + 1 + byte_count);
-  binary->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_byte(Type::STRING));
+  binary->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_byte(TypeKind::STRING));
   binary->set_mem(0, Location_in_byte::SecondFourBit, byte_count);
 
   BinaryIndex b_index = 1;
@@ -53,29 +54,19 @@ Result<BinaryIndex, DeserializeError> String::deserialize(const Binary &binary, 
   return Ok(index);
 }
 
-std::ostream &operator<<(std::ostream &os, const String &string) {
-  os << "field_type: " << string.field_type << " str: " << string.get_string();
-  return os;
-}
-
 std::ostream &String::out(std::ostream &os) const {
-  os << "field_type: " << this->field_type << " str: " << this->str;
+  os << "String{field_type: " << this->field_type << ", str: " << this->str << "}";
   return os;
 }
-bool String::eq(const FieldData &rhs) const {
+bool String::eq(const Type &rhs) const {
   auto rh = dynamic_cast<const String&>(rhs);
   return this->field_type == rh.field_type && str == rh.str;
 }
 
-String::String(std::string str): FieldData(Type::STRING), str(std::move(str)) {}
+String::String(std::string str): Type(TypeKind::STRING), str(std::move(str)) {}
 
-BinaryIndex String::get_total_byte_size() const {
-  int str_size = (int)str.size();
-  auto size_byte_count = get_byte_count(str_size);
-  return str_size + size_byte_count + 1;
-}
-bool String::under(const FieldData &rhs) const {
-  if (rhs.field_type != Type::STRING){
+bool String::under(const Type &rhs) const {
+  if (rhs.field_type != TypeKind::STRING){
     throw CannotConvert("rhs is not String!");
   }
   return str < dynamic_cast<const String&>(rhs).str;

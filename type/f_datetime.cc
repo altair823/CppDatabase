@@ -3,6 +3,7 @@
 //
 
 #include <f_datetime.h>
+#include "type.h"
 
 BinaryUnique DateTime::serialize() const {
   auto result = BinaryFactory::create(6);
@@ -16,10 +17,10 @@ BinaryUnique DateTime::serialize() const {
   return result;
 }
 
-DateTime::DateTime() : FieldData(Type::DATETIME), f_year(0), f_month(0), f_day(0), f_hour(0), f_min(0), f_sec(0) {}
+DateTime::DateTime() : Type(TypeKind::DATETIME), f_year(0), f_month(0), f_day(0), f_hour(0), f_min(0), f_sec(0) {}
 
 DateTime::DateTime(int year, char month, char day, char hour, char min, char sec)
-: FieldData(Type::DATETIME), f_month(month), f_day(day), f_hour(hour), f_min(min), f_sec(sec) {
+: Type(TypeKind::DATETIME), f_month(month), f_day(day), f_hour(hour), f_min(min), f_sec(sec) {
   if (year > 99){
     int y = year % 100;
     f_year = (Byte)y;
@@ -43,14 +44,14 @@ Result<BinaryIndex, DeserializeError> DateTime::deserialize(const Binary &binary
 }
 
 std::ostream &DateTime::out(std::ostream &os) const {
-  os << "field_type: " << this->field_type << " f_year: " << (int) this->f_year << " f_month: " << (int) this->f_month
+  os << "DateTime{field_type: " << this->field_type << " f_year: " << (int) this->f_year << " f_month: " << (int) this->f_month
      << " f_day: " << (int) this->f_day << " f_hour: " << (int) this->f_hour << " f_min: " << (int) this->f_min
      << " f_sec: "
-     << (int) this->f_sec;
+     << (int) this->f_sec << "}";
   return os;
 }
 
-bool DateTime::eq(const FieldData &rhs) const {
+bool DateTime::eq(const Type &rhs) const {
   auto rh = dynamic_cast<const DateTime&>(rhs);
   return this->field_type == rh.field_type &&
       f_year == rh.f_year &&
@@ -60,11 +61,8 @@ bool DateTime::eq(const FieldData &rhs) const {
       f_min == rh.f_min &&
       f_sec == rh.f_sec;
 }
-BinaryIndex DateTime::get_total_byte_size() const {
-  return 6;
-}
-bool DateTime::under(const FieldData &rhs) const {
-  if (rhs.field_type != Type::DATETIME){
+bool DateTime::under(const Type &rhs) const {
+  if (rhs.field_type != TypeKind::DATETIME){
     throw CannotConvert("rhs is not Datetime!");
   }
   auto r = dynamic_cast<const DateTime&>(rhs);

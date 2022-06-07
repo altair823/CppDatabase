@@ -3,6 +3,7 @@
 //
 
 #include <f_int.h>
+#include "type.h"
 BinaryUnique Int::serialize() const {
   auto int_byte_vec = num_to_char_vec(value);
   std::vector<Byte> valid_bytes;
@@ -17,7 +18,7 @@ BinaryUnique Int::serialize() const {
     throw SerializeError("Too big integer");
   }
   auto binary_unique = BinaryFactory::create(1 + valid_bytes.size());
-  binary_unique->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_byte(Type::INT));
+  binary_unique->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_byte(TypeKind::INT));
   binary_unique->set_mem(0, Location_in_byte::SecondFourBit, valid_bytes.size());
   int index = 1;
   for (auto &i: valid_bytes){
@@ -41,18 +42,15 @@ Result<BinaryIndex, DeserializeError> Int::deserialize(const Binary &binary, Bin
   value = (int32)byte_vec_to_num(int_bytes_vec);
   return Ok(index);
 }
-BinaryIndex Int::get_total_byte_size() const {
-  return 0;
-}
-bool Int::eq(const FieldData &rhs) const {
+bool Int::eq(const Type &rhs) const {
   return this->field_type == rhs.field_type && value == dynamic_cast<const Int&>(rhs).value;
 }
 std::ostream &Int::out(std::ostream &ostream) const {
-  ostream << "field_type: " << this->field_type << " value: " << this->value;
+  ostream << "Int{field_type: " << this->field_type << ", value: " << this->value << "}";
   return ostream;
 }
-bool Int::under(const FieldData &rhs) const {
-  if (rhs.field_type != Type::INT){
+bool Int::under(const Type &rhs) const {
+  if (rhs.field_type != TypeKind::INT){
     throw CannotConvert("rhs is not Int!");
   }
   return value < dynamic_cast<const Int&>(rhs).value;

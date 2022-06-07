@@ -64,4 +64,11 @@ bool DBPointer::operator==(const DBPointer &rhs) const {
   return file_name == rhs.file_name &&
       offset == rhs.offset;
 }
+bool DBPointer::operator!=(const DBPointer &rhs) const {
+  return !(rhs == *this);
+}
+
+NodeType byte_to_node_type(Byte byte) {
+  return static_cast<NodeType>(byte);
+}
 

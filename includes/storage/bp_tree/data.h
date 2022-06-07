@@ -8,6 +8,7 @@
 #include <memory>
 #include <serializable.h>
 #include <type_traits>
+#include <ostream>
 
 template <typename Key, typename Value>
 class Data;
@@ -26,30 +27,26 @@ DataUnique<Key, Value> DataFactory<Key, Value>::create(Key key, Value value) {
   return new_data;
 }
 
-struct can_serialize_impl {
-  template <typename Key, typename Value,
-  typename k_s = decltype(std::declval<Key>().serialize()),
-  typename v_s = decltype(std::declval<Value>().serialize())>
-      static std::true_type test(int);
-  template<typename ...>
-    static std::false_type test(...);
-  };
-
 template <typename Key, typename Value>
-struct can_serialize : decltype(can_serialize_impl::test<Key, Value>(0)) {};
-
-template <typename Key, typename Value>
-class Data : public Serializable{
-  static_assert(can_serialize<Key, Value>::value, "Key and Value should be serializable!");
+class Data : public Serializable {
+  static_assert(can_serialize<Key>::value, "Key should be serializable!");
+  static_assert(can_serialize<Value>::value, "Value should be serializable!");
+  static_assert(can_deserialize<Key>::value, "Kay should be deserializable!");
+  static_assert(can_deserialize<Value>::value, "Value should be deserializable!");
  public:
-  Key get_key() {return key;}
-  Value get_value() {return value;}
-
+  Key get_key() { return key; }
+  Value get_value() { return value; }
   [[nodiscard]] BinaryUnique serialize() const override;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
+  bool operator==(const Data &rhs) const;
+  bool operator!=(const Data &rhs) const;
+  friend std::ostream &operator<<(std::ostream &os, const Data<Key, Value> &data) {
+    os << "<Data>\nkey: " << data.key << "\nvalue: " << data.value;
+    return os;
+  }
  private:
   friend class DataFactory<Key, Value>;
-  Data(Key key, Value value): key(key), value(value) {}
+  Data(Key key, Value value) : key(key), value(value) {}
   Key key;
   Value value;
 };
@@ -62,5 +59,16 @@ BinaryUnique Data<Key, Value>::serialize() const {
 }
 template<typename Key, typename Value>
 Result<BinaryIndex, DeserializeError> Data<Key, Value>::deserialize(const Binary &binary, BinaryIndex begin) {
+  BinaryIndex index = key.deserialize(binary, begin).unwrap();
+  index = value.deserialize(binary, index).unwrap();
+  return Ok(index);
+}
+template<typename Key, typename Value>
+bool Data<Key, Value>::operator==(const Data &rhs) const {
+  return key == rhs.key && value == rhs.value;
+}
+template<typename Key, typename Value>
+bool Data<Key, Value>::operator!=(const Data &rhs) const {
+  return !(rhs == *this);
 }
 #endif //CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DATA_H_

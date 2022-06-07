@@ -6,7 +6,7 @@
 #define CPPDATABASE_TEST_UTIL_H
 
 #include <iostream>
-#include <field_data.h>
+#include <type.h>
 
 void print_bits(Binary &binary);
 
