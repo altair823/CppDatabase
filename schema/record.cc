@@ -7,60 +7,111 @@
 #include <utility>
 #include "type.h"
 
-Record::Record(Schema schema): schema(std::move(schema)) {
-
+Record::Record(const Schema& schema) {
+  pk = Field(schema.get_pk().get_name(), type_to_field(schema.get_pk().get_type()).unwrap());
+  for (auto& fk: schema.get_fks()){
+    fks.emplace_back(fk.get_name(), type_to_field(fk.get_type()).unwrap());
+  }
+  for (auto& fk: schema.get_fks()){
+    fks.emplace_back(fk.get_name(), type_to_field(fk.get_type()).unwrap());
+  }
+  for (auto& f: schema.get_other_fields()){
+    other_fields.emplace_back(f.get_name(), type_to_field(f.get_type()).unwrap());
+  }
 }
 
-Result<bool, AlreadyExist> Record::set_field(const std::shared_ptr<Type>& data, const std::string& field_name) {
-  for (const auto& f: fields){
-    if (f.get_name() == field_name){
-      return Err(AlreadyExist("Cannot set a new variable. Same variable name is already exist! : " + field_name));
-    }
+Result<bool, AlreadyExist> Record::set_field(const TypeShared& data, const std::string& field_name) {
+  if (field_name == pk.get_name()){
+    pk = Field(field_name, data);
   }
-  fields.emplace_back(field_name, data);
+  auto fk_it = std::find_if(fks.begin(), fks.end(), [&](const Field& field){
+    if (field.get_name() == field_name){
+      return true;
+    } else {
+      return false;
+    }
+  });
+  if (fk_it != fks.end()){
+    fk_it->set_data(data);
+  }
+
+  auto it = std::find_if(other_fields.begin(), other_fields.end(), [&](const Field& field){
+    if (field.get_name() == field_name){
+      return true;
+    } else {
+      return false;
+    }
+  });
+  if (it != other_fields.end()){
+    it->set_data(data);
+  } else {
+    Err(NotFound("Cannot find the field name {" + field_name + "} in record!"));
+  }
   return Ok(true);
 }
 
-Result<FieldShared, NotFound> Record::get_field(const std::string& field_name) const {
-  for (auto& field: fields){
+Result<Field, NotFound> Record::get_field(const std::string& field_name) const {
+  auto it = std::find_if(other_fields.begin(), other_fields.end(), [&](const Field& field){
     if (field.get_name() == field_name){
-      return Ok(std::make_shared<Field>(field.get_name(), field.get_data()));
+      return true;
+    } else {
+      return false;
     }
+  });
+  if (it != other_fields.end()){
+    return Ok(*it);
+  }
+  if (pk.get_name() == field_name){
+    return Ok(pk);
+  }
+  auto fk_it = std::find_if(fks.begin(), fks.end(), [&](const Field& field){
+    if (field.get_name() == field_name){
+      return true;
+    } else {
+      return false;
+    }
+  });
+  if (fk_it != fks.end()){
+    return Ok(*fk_it);
   }
   return Err(NotFound("Cannot find the field name {" + field_name + "} in record!"));
 }
 
-Result<FieldShared, NotFound> Record::get_pk_field() const {
-  auto pk_name = schema.get_field(KeyType::PK).unwrap().get_name();
-  return Ok(get_field(pk_name).unwrap());
+Result<Field, NotFound> Record::get_pk_field() const {
+  return Ok(pk);
 }
 
 std::ostream &operator<<(std::ostream &os, const Record &record) {
   os << "Record{";
-  for (auto& f: record.fields){
-    os << "\n    type: " << record.get_schema().get_field_key_type(f.get_name()).unwrap() << ", domain: " << f.get_name() << ", field: " << *f.get_data();
+  os << "\n    type: pk, name: " << record.pk.get_name() << ", field: " << *record.pk.get_data();
+  for (auto& fk: record.fks){
+    os << "\n    type: fk, name: " << fk.get_name() << ", field: " << *fk.get_data();
+  }
+  for (auto& f: record.other_fields){
+    os << "\n    type: none, name: " << f.get_name() << ", field: " << *f.get_data();
   }
   os << "\n}";
   return os;
 }
 
 bool Record::operator==(const Record &rhs) const {
-  if (this->fields.size() != rhs.fields.size()){
+  if (pk != rhs.pk || this->other_fields != rhs.other_fields || fks != rhs.fks){
     return false;
+  } else {
+    return true;
   }
-
-  return (std::all_of(fields.begin(), fields.end(), [&rhs](const Field& field){
-    if (!rhs.get_field(field.get_name()).unwrap() || *field.get_data() != *rhs.get_field(field.get_name()).unwrap()->get_data()){
-      return false;
-    } else{
-      return true;
-    }
-  }));
 }
 
 BinaryUnique Record::serialize() const {
+  if (fks.size() > 256){
+    throw SerializeError("Too many FKs(over 256)!");
+  }
   auto binary = BinaryFactory::create(0);
-  for (auto& f: fields){
+  binary = *binary + *(pk.serialize());
+  for (auto& fk: fks){
+    binary = *binary + *(fk.serialize());
+  }
+  for (auto& f: other_fields){
     auto b = f.get_data()->serialize();
     binary = *binary + *b;
   }
@@ -69,14 +120,12 @@ BinaryUnique Record::serialize() const {
 
 Result<BinaryIndex, DeserializeError> Record::deserialize(const Binary &binary, BinaryIndex begin) {
   BinaryIndex index = begin;
-  for (auto &field_schema: schema){
-    auto type = byte_to_type(binary.read_mem(index, Location_in_byte::FirstFourBit));
-    if (type != field_schema.get_type()){
-      throw DeserializeError("Wrong binary! (maybe mismatched with schema)");
-    }
-    auto field = type_to_field(type).unwrap();
-    index = field->deserialize(binary, index).unwrap();
-    fields.emplace_back(field_schema.get_name(), field);
+  index = pk.deserialize(binary, index).unwrap();
+  for (auto& fk: fks){
+    index = fk.deserialize(binary, index).unwrap();
+  }
+  for (auto& f: other_fields){
+    index = f.deserialize(binary, index).unwrap();
   }
   return Ok(index);
 }

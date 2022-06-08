@@ -29,11 +29,8 @@ Table::Table(SchemaShared schema, StorageShared<Field, Record> storage)
 }
 
 Result<bool, InsertionError> Table::add_record(const Record& record){
-  if (*schema != record.get_schema()){
-    return Err(InsertionError("The record does not match with schema!"));
-  }
   auto key = record.get_pk_field().unwrap();
-  if (!storage->insert(*key, record, false)){
+  if (!storage->insert(key, record, false)){
     return Err(InsertionError("Cannot insert record in the storage!"));
   }
   return Ok(true);

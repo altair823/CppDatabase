@@ -701,7 +701,7 @@ typename std::enable_if<
 } // namespace concept
 
 template<typename T, typename E>
-struct Result {
+struct [[nodiscard]] Result {
 
     static_assert(!std::is_same<E, void>::value, "void error type is not allowed");
 

@@ -12,13 +12,14 @@
 #include <f_int.h>
 #include <ostream>
 
-class Field : public Serializable{
+class [[nodiscard]] Field : public Serializable{
  public:
   Field(): data(nullptr) {}
   explicit Field(std::string name): data(nullptr), name(std::move(name)) {}
   Field(std::string name, TypeShared data): data(std::move(data)), name(std::move(name)){}
   [[nodiscard]] TypeShared get_data() const {return data;}
   [[nodiscard]] std::string get_name() const {return name;}
+  void set_data(TypeShared new_data) {data = new_data;}
   [[nodiscard]] BinaryUnique serialize() const override;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
   friend std::ostream &operator<<(std::ostream &os, const Field &field);

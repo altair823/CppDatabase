@@ -28,8 +28,8 @@ TEST(RecordTest, SetFieldTest){
   DateTime exp_dt(2022, 5, 4, 17, 5, 20);
   String exp_str("this is string type variable. 이것은 문자열 타입 변수입니다.");
 
-  ASSERT_EQ(exp_dt, *record.fields[0].get_data());
-  ASSERT_EQ(exp_str, *record.fields[1].get_data());
+  ASSERT_EQ(exp_dt, *record.get_field("Created date").unwrap().get_data());
+  ASSERT_EQ(exp_str, *record.get_field("string").unwrap().get_data());
 }
 
 TEST(RecordTest, GetFieldTest){
@@ -41,8 +41,8 @@ TEST(RecordTest, GetFieldTest){
   record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date");
   record.set_field(std::make_shared<String>("this is string type variable. 이것은 문자열 타입 변수입니다."), "File name");
 
-  auto f1 = record.get_field("Created date").unwrap()->get_data();
-  auto f2 = record.get_field("File name").unwrap()->get_data();
+  auto f1 = record.get_field("Created date").unwrap().get_data();
+  auto f2 = record.get_field("File name").unwrap().get_data();
 
   //std::cout<<*f1<<std::endl<<*f2<<std::endl;
 

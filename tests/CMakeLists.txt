@@ -22,6 +22,7 @@ add_executable(
         schema/record_test.cc
         schema/schema_test.cc
         schema/table_test.cpp
+        schema/data_test.cpp
 
         type/f_datetime_test.cc
         type/f_string_test.cc
@@ -29,7 +30,8 @@ add_executable(
         bp_tree/db_io_test.cc
         bp_tree/bp_tree_test.cpp
         bp_tree/index_node_test.cpp
-        bp_tree/data_node_test.cpp bp_tree/data_test.cpp type/f_int_test.cpp)
+        bp_tree/data_node_test.cpp
+        type/f_int_test.cpp)
 target_link_libraries(
         test
         gtest_main

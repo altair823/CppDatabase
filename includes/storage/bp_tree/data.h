@@ -10,22 +10,6 @@
 #include <type_traits>
 #include <ostream>
 
-template <typename Key, typename Value>
-class Data;
-
-template <typename Key, typename Value>
-using DataUnique = std::unique_ptr<Data<Key, Value>>;
-
-template <typename Key, typename Value>
-class DataFactory {
- public:
-  static DataUnique<Key, Value> create(Key key, Value value);
-};
-template<typename Key, typename Value>
-DataUnique<Key, Value> DataFactory<Key, Value>::create(Key key, Value value) {
-  DataUnique<Key, Value> new_data(new Data<Key, Value>(key, value));
-  return new_data;
-}
 
 template <typename Key, typename Value>
 class Data : public Serializable {
@@ -34,41 +18,30 @@ class Data : public Serializable {
   static_assert(can_deserialize<Key>::value, "Kay should be deserializable!");
   static_assert(can_deserialize<Value>::value, "Value should be deserializable!");
  public:
-  Key get_key() { return key; }
-  Value get_value() { return value; }
-  [[nodiscard]] BinaryUnique serialize() const override;
-  Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
+  virtual std::shared_ptr<Key> get_key() const = 0;
+  virtual std::shared_ptr<Value> get_value() const = 0;
   bool operator==(const Data &rhs) const;
   bool operator!=(const Data &rhs) const;
+
   friend std::ostream &operator<<(std::ostream &os, const Data<Key, Value> &data) {
-    os << "<Data>\nkey: " << data.key << "\nvalue: " << data.value;
-    return os;
+    return data.out(os);
   }
+
  private:
-  friend class DataFactory<Key, Value>;
-  Data(Key key, Value value) : key(key), value(value) {}
-  Key key;
-  Value value;
+  virtual bool eq(const Data &rhs) const = 0;
+  virtual std::ostream& out(std::ostream&) const = 0;
 };
 
 template<typename Key, typename Value>
-BinaryUnique Data<Key, Value>::serialize() const {
-  auto key_binary = key.serialize();
-  auto value_binary = value.serialize();
-  return *key_binary + *value_binary;
-}
-template<typename Key, typename Value>
-Result<BinaryIndex, DeserializeError> Data<Key, Value>::deserialize(const Binary &binary, BinaryIndex begin) {
-  BinaryIndex index = key.deserialize(binary, begin).unwrap();
-  index = value.deserialize(binary, index).unwrap();
-  return Ok(index);
-}
-template<typename Key, typename Value>
 bool Data<Key, Value>::operator==(const Data &rhs) const {
-  return key == rhs.key && value == rhs.value;
+  return eq(rhs);
 }
 template<typename Key, typename Value>
 bool Data<Key, Value>::operator!=(const Data &rhs) const {
-  return !(rhs == *this);
+  return !eq(rhs);
 }
+
+
+
+
 #endif //CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DATA_H_

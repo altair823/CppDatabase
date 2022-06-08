@@ -8,7 +8,6 @@
 #include "../storage_interface.h"
 #include "index_node.h"
 #include "data_node.h"
-#include "dto.h"
 
 template <typename Key, typename Value>
 class BPTree : public Storage<Key, Value> {

@@ -13,36 +13,39 @@
 #include <data.h>
 #include <db_io.h>
 
-template <typename Key, typename Value>
+template <typename Key, typename Value, typename Data>
 class DataNode;
 
-template <typename Key, typename Value>
-using DataNodeShared = std::shared_ptr<DataNode<Key, Value>>;
+template <typename Key, typename Value, typename Data>
+using DataNodeShared = std::shared_ptr<DataNode<Key, Value, Data>>;
 
-template <typename Key, typename Value>
+template <typename Key, typename Value, typename Data>
 class DataNodeFactory {
  public:
-  static DataNodeShared<Key, Value> create();
+  static DataNodeShared<Key, Value, Data> create();
 };
 
-template <typename Key, typename Value>
+template <typename Key, typename Value, typename Data>
 class DataNode : public Serializable{
  public:
-  Key get_key(int index) const {return data[index]->get_key();}
-  Value get_value(int index) const {return data[index]->get_value();}
-  DataUnique<Key, Value> pop_data(int index) {return data[index];}
+using DataUnique = std::unique_ptr<Data>;
+using KeyShared = std::shared_ptr<Key>;
+using ValueShared = std::shared_ptr<Value>;
+  KeyShared get_key(int index) const {return data[index]->get_key();}
+  ValueShared get_value(int index) const {return data[index]->get_value();}
+  Data pop_data(int index) {return data[index];}
   [[nodiscard]] int get_data_count() const {return data.size();}
 
-  void set_left_sibling(DataNodeShared<Key, Value> data_node) {left = data_node;};
-  void set_right_sibling(DataNodeShared<Key, Value> data_node) {right = data_node;};
-  DataNodeShared<Key, Value> get_left_sibling() const {return left;}
-  DataNodeShared<Key, Value> get_right_sibling() const {return right;}
+  void set_left_sibling(DataNodeShared<Key, Value, Data> data_node) {left = data_node;};
+  void set_right_sibling(DataNodeShared<Key, Value, Data> data_node) {right = data_node;};
+  DataNodeShared<Key, Value, Data> get_left_sibling() const {return left;}
+  DataNodeShared<Key, Value, Data> get_right_sibling() const {return right;}
 
   int in_begin() {return 0;}
   int in_end() {return data.size() - 1;}
 
-  Result<void, InsertionError> insert(int index, DataUnique<Key, Value> new_data);
-  Result<void, InsertionError> push_back(DataUnique<Key, Value> new_data);
+  void insert(int index, DataUnique new_data);
+  void push_back(DataUnique new_data);
   int search(Key key) const;
 
   [[nodiscard]] BinaryUnique serialize() const override;
@@ -52,38 +55,33 @@ class DataNode : public Serializable{
   bool operator!=(const DataNode &rhs) const;
 
  private:
-  friend class DataNodeFactory<Key, Value>;
+  friend class DataNodeFactory<Key, Value, Data>;
 
   DBPointer left, right;
-  std::vector<DataUnique<Key, Value>> data;
+  std::vector<DataUnique> data;
 };
-template<typename Key, typename Value>
-DataNodeShared<Key, Value> DataNodeFactory<Key, Value>::create() {
-  DataNodeShared<Key, Value> new_data_node(new DataNode<Key, Value>());
+template<typename Key, typename Value, typename Data>
+DataNodeShared<Key, Value, Data> DataNodeFactory<Key, Value, Data>::create() {
+  DataNodeShared<Key, Value, Data> new_data_node(new DataNode<Key, Value, Data>());
   return new_data_node;
 }
-template<typename Key, typename Value>
-Result<void, InsertionError>  DataNode<Key, Value>::insert(int index, DataUnique<Key, Value> new_data) {
-  if (index > data.size() || index < 0){
-    return Err(InsertionError("Wrong index!"));
-  }
+template<typename Key, typename Value, typename Data>
+void  DataNode<Key, Value, Data>::insert(int index, DataUnique new_data) {
   data.insert(data.begin() + index, std::move(new_data));
-  return Ok();
 }
-template<typename Key, typename Value>
-Result<void, InsertionError> DataNode<Key, Value>::push_back(DataUnique<Key, Value> new_data) {
+template<typename Key, typename Value, typename Data>
+void DataNode<Key, Value, Data>::push_back(DataUnique new_data) {
   data.push_back(std::move(new_data));
-  return Ok();
 }
-template<typename Key, typename Value>
-int DataNode<Key, Value>::search(Key key) const {
-  auto iterator = std::lower_bound(data.begin(), data.end(), key, [&](const DataUnique<Key, Value> &data_it, const Key &key){
-    return data_it->get_key() < key;
+template<typename Key, typename Value, typename Data>
+int DataNode<Key, Value, Data>::search(Key key) const {
+  auto iterator = std::lower_bound(data.begin(), data.end(), key, [&](const DataUnique &data_it, const Key &key){
+    return *(data_it->get_key()) < key;
   });
   return std::distance(data.begin(), iterator);
 }
-template<typename Key, typename Value>
-BinaryUnique DataNode<Key, Value>::serialize() const {
+template<typename Key, typename Value, typename Data>
+BinaryUnique DataNode<Key, Value, Data>::serialize() const {
   Byte node_type = static_cast<Byte>(NodeType::DataNode);
   if (data.size() >= 4096){
     throw std::range_error("Too many data(over 4096)!");
@@ -111,8 +109,8 @@ BinaryUnique DataNode<Key, Value>::serialize() const {
   }
   return binary;
 }
-template<typename Key, typename Value>
-Result<BinaryIndex, DeserializeError> DataNode<Key, Value>::deserialize(const Binary &binary, BinaryIndex begin) {
+template<typename Key, typename Value, typename Data>
+Result<BinaryIndex, DeserializeError> DataNode<Key, Value, Data>::deserialize(const Binary &binary, BinaryIndex begin) {
   BinaryIndex index = begin;
   if (byte_to_node_type(binary.read_mem(index, Location_in_byte::FirstFourBit)) != NodeType::DataNode){
     return Err(DeserializeError("Wrong binary(this binary may not be for DataNode)!"));
@@ -127,8 +125,8 @@ Result<BinaryIndex, DeserializeError> DataNode<Key, Value>::deserialize(const Bi
     //data.push_back(DataFactory<Key, Value>::create());
   }
 }
-template<typename Key, typename Value>
-bool DataNode<Key, Value>::operator==(const DataNode &rhs) const {
+template<typename Key, typename Value, typename Data>
+bool DataNode<Key, Value, Data>::operator==(const DataNode<Key, Value, Data> &rhs) const {
   if (left != rhs.left || right != rhs.right || data.size() != rhs.data.size()){
     return false;
   } else {
@@ -141,8 +139,8 @@ bool DataNode<Key, Value>::operator==(const DataNode &rhs) const {
   return left == rhs.left  &&
       data == rhs.data;
 }
-template<typename Key, typename Value>
-bool DataNode<Key, Value>::operator!=(const DataNode &rhs) const {
+template<typename Key, typename Value, typename Data>
+bool DataNode<Key, Value, Data>::operator!=(const DataNode &rhs) const {
   return !(rhs == *this);
 }
 #endif //CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DATA_NODE_H_

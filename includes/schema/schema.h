@@ -22,6 +22,7 @@ std::ostream &operator<<(std::ostream &os, const KeyType &key_type);
 
 class FieldSchema{
  public:
+  FieldSchema(): type(TypeKind::NONE) {}
   FieldSchema(TypeKind type, std::string name): type(type), name(std::move(name)) {}
 
   friend std::ostream &operator<<(std::ostream &os, const FieldSchema &schema) {
@@ -49,10 +50,13 @@ class Schema {
  public:
   explicit Schema(std::string schema_name);
 
+  [[nodiscard]] FieldSchema get_pk() const {return pk;}
+  [[nodiscard]] Result<FieldSchema, NotFound> get_fk(const std::string& field_name) const;
+  [[nodiscard]] std::vector<FieldSchema> get_fks() const {return fks;}
+  [[nodiscard]] std::vector<FieldSchema> get_other_fields() const {return other_fields;}
   [[nodiscard]] Result<FieldSchema, NotFound> get_field(const std::string& field_name) const;
   template<typename Predicate>
   Result<FieldSchema, NotFound> get_field(const std::string& field_name, Predicate predicate) const;
-  [[nodiscard]] Result<FieldSchema, NotFound> get_field(unsigned int index) const;
   [[nodiscard]] Result<FieldSchema, NotFound> get_field(KeyType key_type, const std::string& field_name = "") const;
   [[nodiscard]] Result<KeyType, NotFound> get_field_key_type(const std::string& field_name) const;
 
@@ -64,16 +68,11 @@ class Schema {
   using iterator = std::vector<FieldSchema>::iterator;
   using const_iterator = std::vector<FieldSchema>::const_iterator;
 
-  iterator begin() {return fields.begin();}
-  iterator end() {return fields.end();}
-  [[nodiscard]] const_iterator cbegin() const {return fields.cbegin();}
-  [[nodiscard]] const_iterator cend() const {return fields.cend();}
-
  private:
   std::string schema_name;
-  unsigned int pk_index;
-  std::vector<unsigned int> fk_indexes;
-  std::vector<FieldSchema> fields;
+  FieldSchema pk;
+  std::vector<FieldSchema> fks;
+  std::vector<FieldSchema> other_fields;
 };
 
 class SchemaBuilder {
@@ -84,9 +83,10 @@ class SchemaBuilder {
 
  private:
   std::string schema_name;
-  unsigned int pk_index;
-  std::vector<unsigned int> fk_indexes;
-  std::vector<FieldSchema> fields;
+  bool is_pk_exist;
+  FieldSchema pk;
+  std::vector<FieldSchema> fks;
+  std::vector<FieldSchema> other_fields;
 };
 
 

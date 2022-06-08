@@ -21,25 +21,25 @@
 
 
 
-class Record : public Serializable{
+class [[nodiscard]] Record : public Serializable{
  public:
-  explicit Record(Schema schema);
+  explicit Record(const Schema& schema);
 
-  Result<bool, AlreadyExist> set_field(const std::shared_ptr<Type>& data, const std::string& field_name);
-  [[nodiscard]] Result<FieldShared, NotFound> get_field(const std::string& field_name) const;
-  [[nodiscard]] Result<FieldShared, NotFound> get_pk_field() const;
+  Result<bool, AlreadyExist> set_field(const TypeShared& data, const std::string& field_name);
+  [[nodiscard]] Result<Field, NotFound> get_field(const std::string& field_name) const;
+  [[nodiscard]] Result<Field, NotFound> get_pk_field() const;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
   [[nodiscard]] BinaryUnique serialize() const override;
 
-  [[nodiscard]] Schema get_schema() const {return schema;}
   friend std::ostream &operator<<(std::ostream &os, const Record &schema);
   bool operator==(const Record &rhs) const;
 
-  std::vector<Field> fields;
-  Schema schema;
+  Field pk;
+  std::vector<Field> fks;
+  std::vector<Field> other_fields;
 };
 
-typedef std::unique_ptr<Record> RecordUnique;
+typedef std::shared_ptr<Record> RecordShared;
 
 Result<TypeShared, CannotConvert> type_to_field(TypeKind type);
 

@@ -2,16 +2,14 @@ add_library(
         schema
         record.cc
         schema.cc
-        ../includes/schema/field.h field.cpp)
+        bp_tree_data.cpp
+        field.cpp
+)
 
 target_include_directories(
         schema
         PUBLIC
         ${PROJECT_SOURCE_DIR}/includes/schema
-)
-target_include_directories(
-        schema
-        PUBLIC
         ${PROJECT_SOURCE_DIR}/includes/storage
 )
 target_compile_options(
