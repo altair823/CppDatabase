@@ -9,9 +9,9 @@
 #include <field.h>
 #include <record.h>
 
-class BPTreeData : public Data<Field, Record> {
+class DBData : public Data<Field, Record> {
  public:
-  BPTreeData(const std::string& key_name, const Record& record);
+  DBData(const Record& record);
   [[nodiscard]] BinaryUnique serialize() const override;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
   [[nodiscard]] std::shared_ptr<Field> get_key() const override;
@@ -23,6 +23,14 @@ class BPTreeData : public Data<Field, Record> {
 
   FieldShared key;
   RecordShared value;
+};
+
+class DBDataFactory : public DataFactory<Field, Record, DBData> {
+ public:
+  explicit DBDataFactory(SchemaShared schema_shared);
+  std::unique_ptr<DBData> create_data() override;
+ private:
+  SchemaShared schema_shared;
 };
 
 #endif //CPPDATABASE_INCLUDES_SCHEMA_BP_TREE_DATA_H_

@@ -16,7 +16,7 @@ TEST(IntTest, DeserializeTest){
   Int i(541377157);
   auto binary = i.serialize();
   Int j;
-  j.deserialize(*binary, 0);
+  j.deserialize(*binary, 0).unwrap();
   //std::cout<<j;
   ASSERT_EQ(i, j);
 }

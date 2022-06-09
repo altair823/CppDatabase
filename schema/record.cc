@@ -12,9 +12,6 @@ Record::Record(const Schema& schema) {
   for (auto& fk: schema.get_fks()){
     fks.emplace_back(fk.get_name(), type_to_field(fk.get_type()).unwrap());
   }
-  for (auto& fk: schema.get_fks()){
-    fks.emplace_back(fk.get_name(), type_to_field(fk.get_type()).unwrap());
-  }
   for (auto& f: schema.get_other_fields()){
     other_fields.emplace_back(f.get_name(), type_to_field(f.get_type()).unwrap());
   }

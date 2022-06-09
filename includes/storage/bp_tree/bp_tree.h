@@ -22,7 +22,7 @@ class BPTree : public Storage<Key, Value> {
 };
 template<typename Key, typename Value>
 bool BPTree<Key, Value>::insert(Key key, Value value, bool to_override) {
-  return false;
+  return true;
 }
 template<typename Key, typename Value>
 Result<Value, std::string> BPTree<Key, Value>::search(Key key) {

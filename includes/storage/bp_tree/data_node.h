@@ -22,7 +22,7 @@ using DataNodeShared = std::shared_ptr<DataNode<Key, Value, Data>>;
 template <typename Key, typename Value, typename Data>
 class DataNodeFactory {
  public:
-  static DataNodeShared<Key, Value, Data> create();
+  static DataNodeShared<Key, Value, Data> create(std::unique_ptr<DataFactory<Key, Value, Data>> data_factory);
 };
 
 template <typename Key, typename Value, typename Data>
@@ -56,13 +56,16 @@ using ValueShared = std::shared_ptr<Value>;
 
  private:
   friend class DataNodeFactory<Key, Value, Data>;
+  explicit DataNode(std::unique_ptr<DataFactory<Key, Value, Data>> data_factory): data_factory(std::move(data_factory)) {}
 
   DBPointer left, right;
   std::vector<DataUnique> data;
+
+  std::unique_ptr<DataFactory<Key, Value, Data>> data_factory;
 };
 template<typename Key, typename Value, typename Data>
-DataNodeShared<Key, Value, Data> DataNodeFactory<Key, Value, Data>::create() {
-  DataNodeShared<Key, Value, Data> new_data_node(new DataNode<Key, Value, Data>());
+DataNodeShared<Key, Value, Data> DataNodeFactory<Key, Value, Data>::create(std::unique_ptr<DataFactory<Key, Value, Data>> data_factory) {
+  DataNodeShared<Key, Value, Data> new_data_node(new DataNode<Key, Value, Data>(std::move(data_factory)));
   return new_data_node;
 }
 template<typename Key, typename Value, typename Data>
@@ -115,15 +118,16 @@ Result<BinaryIndex, DeserializeError> DataNode<Key, Value, Data>::deserialize(co
   if (byte_to_node_type(binary.read_mem(index, Location_in_byte::FirstFourBit)) != NodeType::DataNode){
     return Err(DeserializeError("Wrong binary(this binary may not be for DataNode)!"));
   }
-  std::vector<unsigned char> data_count_vec;
-  data_count_vec.push_back(binary.read_mem(index, Location_in_byte::SecondFourBit));
+  int data_count = binary.read_mem(index, Location_in_byte::SecondFourBit) << 8;
   index++;
-  data_count_vec.push_back(binary.read_mem(index));
+  data_count += binary.read_mem(index);
   index++;
-  int data_count = (int)byte_vec_to_num(data_count_vec);
   for (int i = 0; i < data_count; i++){
-    //data.push_back(DataFactory<Key, Value>::create());
+    auto new_data = data_factory->create_data();
+    index = new_data->deserialize(binary, index).unwrap();
+    data.push_back(std::move(new_data));
   }
+  return Ok(index);
 }
 template<typename Key, typename Value, typename Data>
 bool DataNode<Key, Value, Data>::operator==(const DataNode<Key, Value, Data> &rhs) const {
@@ -136,8 +140,7 @@ bool DataNode<Key, Value, Data>::operator==(const DataNode<Key, Value, Data> &rh
       }
     }
   }
-  return left == rhs.left  &&
-      data == rhs.data;
+  return true;
 }
 template<typename Key, typename Value, typename Data>
 bool DataNode<Key, Value, Data>::operator!=(const DataNode &rhs) const {

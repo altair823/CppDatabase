@@ -9,6 +9,8 @@
 #include <serializable.h>
 #include <type_traits>
 #include <ostream>
+#include <utility>
+#include <schema.h>
 
 
 template <typename Key, typename Value>
@@ -41,7 +43,11 @@ bool Data<Key, Value>::operator!=(const Data &rhs) const {
   return !eq(rhs);
 }
 
-
-
+template <typename Key, typename Value, typename Data>
+class DataFactory {
+ public:
+  virtual std::unique_ptr<Data> create_data() = 0;
+  virtual ~DataFactory() = default;
+};
 
 #endif //CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DATA_H_

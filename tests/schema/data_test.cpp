@@ -18,15 +18,15 @@ TEST(DataTest, SerializeTest){
       ->build().unwrap();
 
   Record record(*schema);
-  record.set_field(std::make_shared<String>("key1"), "pk_str");
-  record.set_field(std::make_shared<String>("key2"), "fk_str");
-  record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date");
+  record.set_field(std::make_shared<String>("key1"), "pk_str").unwrap();
+  record.set_field(std::make_shared<String>("key2"), "fk_str").unwrap();
+  record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date").unwrap();
 
-  auto data = BPTreeData("pk_str", record);
-  //auto data_binary = data->serialize();
+  auto data = DBData(record);
+  auto data_binary = data.serialize();
   auto new_record = Record(*schema);
-  auto new_data = BPTreeData(schema->get_field(KeyType::PK).unwrap().get_name(), new_record);
-  //new_data->deserialize(*data_binary, 0).unwrap();
+  auto new_data = DBData(new_record);
+  new_data.deserialize(*data_binary, 0).unwrap();
   //std::cout<<*new_data;
-  //ASSERT_EQ(*new_data, *data);
+  ASSERT_EQ(new_data, data);
 }

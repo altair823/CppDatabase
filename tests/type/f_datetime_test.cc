@@ -28,7 +28,7 @@ TEST(DateTimeTest, SerializeTest) {
   //std::cout<<d<<std::endl;
 
   auto c = DateTime();
-  c.deserialize(*a, 0);
+  c.deserialize(*a, 0).unwrap();
   //std::cout<<c<<std::endl;
 
   ASSERT_EQ(d, c);

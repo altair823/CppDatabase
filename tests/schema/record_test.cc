@@ -8,21 +8,19 @@
 #include <f_datetime.h>
 #include <f_string.h>
 
-#include "test_util.h"
-
 TEST(RecordTest, SetFieldTest){
   SchemaBuilder schema_builder("test schema1");
   auto schema = schema_builder.set_field(TypeKind::DATETIME, "Created date").unwrap()
       ->set_field(TypeKind::STRING, "string", KeyType::PK).unwrap()
       ->build().unwrap();
   Record record(*schema);
-  record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date");
+  record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date").unwrap();
   // std::cout<<*schema.fields[0].type<<std::endl;
 
   auto str1 = std::make_shared<String>();
 
   str1->set_string("this is string type variable. 이것은 문자열 타입 변수입니다.");
-  record.set_field(str1, "string");
+  record.set_field(str1, "string").unwrap();
   // std::cout<<*schema.fields[1].type<<std::endl;
 
   DateTime exp_dt(2022, 5, 4, 17, 5, 20);
@@ -38,8 +36,8 @@ TEST(RecordTest, GetFieldTest){
       ->set_field(TypeKind::STRING, "File name", KeyType::PK).unwrap()
       ->build().unwrap();
   Record record(*schema);
-  record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date");
-  record.set_field(std::make_shared<String>("this is string type variable. 이것은 문자열 타입 변수입니다."), "File name");
+  record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date").unwrap();
+  record.set_field(std::make_shared<String>("this is string type variable. 이것은 문자열 타입 변수입니다."), "File name").unwrap();
 
   auto f1 = record.get_field("Created date").unwrap().get_data();
   auto f2 = record.get_field("File name").unwrap().get_data();
@@ -64,17 +62,17 @@ TEST(RecordTest, VectoredTest){
     records.emplace_back(*schema);
   }
   for (auto& s: records){
-    s.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date");
-    s.set_field(std::make_shared<DateTime>(2022, 6, 2, 20, 39, 10), "Edited date");
-    s.set_field(std::make_shared<String>("this is string type variable. 이것은 문자열 타입 변수입니다."), "File name");
+    s.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date").unwrap();
+    s.set_field(std::make_shared<DateTime>(2022, 6, 2, 20, 39, 10), "Edited date").unwrap();
+    s.set_field(std::make_shared<String>("this is string type variable. 이것은 문자열 타입 변수입니다."), "File name").unwrap();
   }
 //  for (auto &s: schemas){
 //    std::cout<<s<<std::endl;
 //  }
   Record exp_record(*schema);
-  exp_record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date");
-  exp_record.set_field(std::make_shared<DateTime>(2022, 6, 2, 20, 39, 10), "Edited date");
-  exp_record.set_field(std::make_shared<String>("this is string type variable. 이것은 문자열 타입 변수입니다."), "File name");
+  exp_record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date").unwrap();
+  exp_record.set_field(std::make_shared<DateTime>(2022, 6, 2, 20, 39, 10), "Edited date").unwrap();
+  exp_record.set_field(std::make_shared<String>("this is string type variable. 이것은 문자열 타입 변수입니다."), "File name").unwrap();
 
   ASSERT_EQ(records[0], exp_record);
 }
@@ -93,9 +91,9 @@ TEST(RecordTest, DeserializeTest){
       ->build().unwrap();
 
   Record record(*schema);
-  record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), field_names[0]);
-  record.set_field(std::make_shared<DateTime>(2022, 6, 2, 20, 39, 10), field_names[1]);
-  record.set_field(std::make_shared<String>("this is string type variable. 이것은 문자열 타입 변수입니다."), field_names[2]);
+  record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), field_names[0]).unwrap();
+  record.set_field(std::make_shared<DateTime>(2022, 6, 2, 20, 39, 10), field_names[1]).unwrap();
+  record.set_field(std::make_shared<String>("this is string type variable. 이것은 문자열 타입 변수입니다."), field_names[2]).unwrap();
 
   //std::cout<<schema<<std::endl;
   auto b = record.serialize();
@@ -105,7 +103,7 @@ TEST(RecordTest, DeserializeTest){
 
 
   Record deserialized_record(*schema);
-  deserialized_record.deserialize(*b, 0);
+  deserialized_record.deserialize(*b, 0).unwrap();
   //std::cout<<*schema_unique<<std::endl;
 
   ASSERT_EQ(record, deserialized_record);

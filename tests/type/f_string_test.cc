@@ -3,7 +3,6 @@
 //
 
 #include <gtest/gtest.h>
-#include <type.h>
 #include <mem_core.h>
 #include <f_string.h>
 #include <test_util.h>
@@ -46,7 +45,7 @@ TEST(StringTest, SerializeTest) {
   //print_bits(b, 272);
 
   String t;
-  t.deserialize(*b, 0);
+  t.deserialize(*b, 0).unwrap();
   //std::cout<<t<<std::endl;
 
   ASSERT_EQ(a, t);

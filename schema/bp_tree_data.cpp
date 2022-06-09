@@ -4,25 +4,39 @@
 
 #include <bp_tree_data.h>
 
-BPTreeData::BPTreeData(const std::string& key_name, const Record& record): value(std::make_shared<Record>(record)) {
-  key = std::make_shared<Field>(record.get_field(key_name).unwrap());
-}
-BinaryUnique BPTreeData::serialize() const {
+#include <utility>
 
+DBData::DBData(const Record& record): value(std::make_shared<Record>(record)) {
+  key = std::make_shared<Field>(record.get_pk_field().unwrap());
 }
-Result<BinaryIndex, DeserializeError> BPTreeData::deserialize(const Binary &binary, BinaryIndex begin) {
-
+BinaryUnique DBData::serialize() const {
+  auto binary = value->serialize();
+  // Don't serialize and deserialize the key because it is just a pointer of PK in record.
+  return binary;
 }
-std::shared_ptr<Field> BPTreeData::get_key() const {
+Result<BinaryIndex, DeserializeError> DBData::deserialize(const Binary &binary, BinaryIndex begin) {
+  BinaryIndex index = begin;
+  index = value->deserialize(binary, index).unwrap();
+  return Ok(index);
+}
+std::shared_ptr<Field> DBData::get_key() const {
   return key;
 }
-std::shared_ptr<Record> BPTreeData::get_value() const {
+std::shared_ptr<Record> DBData::get_value() const {
   return value;
 }
-bool BPTreeData::eq(const Data<Field, Record> &rhs) const {
-  return *key == *rhs.get_key();
+bool DBData::eq(const Data<Field, Record> &rhs) const {
+  return *key == *rhs.get_key() && *value == *rhs.get_value();
 }
-std::ostream &BPTreeData::out(std::ostream &ostream) const {
+std::ostream &DBData::out(std::ostream &ostream) const {
   ostream << "<BPTreeData>\nkey: " << key << "\nvalue: " << value;
   return ostream;
+}
+DBDataFactory::DBDataFactory(SchemaShared schema_shared) : schema_shared(std::move(schema_shared)) {
+
+}
+std::unique_ptr<DBData> DBDataFactory::create_data() {
+  auto pk_name = schema_shared->get_pk().get_name();
+  auto record = Record(*schema_shared);
+  return std::make_unique<DBData>(record);
 }

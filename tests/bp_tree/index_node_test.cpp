@@ -21,7 +21,7 @@ TEST(IndexNodeTest, SerializeTest){
   auto index_node = IndexNodeFactory<String>::create(keys, pointers);
   auto binary = index_node->serialize();
   auto new_index_node = IndexNodeFactory<String>::create();
-  new_index_node->deserialize(*binary, 0);
+  new_index_node->deserialize(*binary, 0).unwrap();
 
   ASSERT_EQ(*index_node, *new_index_node);
 }
