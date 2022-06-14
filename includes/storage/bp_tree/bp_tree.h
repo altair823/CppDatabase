@@ -12,7 +12,7 @@
 template <typename Key, typename Value>
 class BPTree : public Storage<Key, Value> {
  public:
-  explicit BPTree(std::string head_file): head(std::move(head_file), 0) {}
+  explicit BPTree(std::string head_file): head(std::move(head_file), 0, 0) {}
   bool insert(Key key, Value value, bool to_override) override;
   Result<Value, std::string> search(Key key) override;
   Result<std::vector<Value>, std::string> search(Key begin, Key end) override;

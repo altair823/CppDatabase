@@ -17,3 +17,13 @@ TEST(BinaryTest, OperatorTest){
   auto binary2 = String("testtesttesttesttesttesttesttest").serialize();
   auto binary3 = *binary1 + *binary2;
 }
+
+TEST(BinaryTest, SaveTest){
+  auto datetime = DateTime(20, 12, 30, 9, 32, 54);
+  auto binary = datetime.serialize();
+  ASSERT_TRUE(binary->save("testb"));
+  auto new_binary = BinaryFactory::read("testb", 0, binary->get_length());
+  auto new_datetime = DateTime();
+  new_datetime.deserialize(*new_binary, 0).unwrap();
+  ASSERT_EQ(datetime, new_datetime);
+}

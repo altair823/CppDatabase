@@ -29,7 +29,7 @@ bool DBData::eq(const Data<Field, Record> &rhs) const {
   return *key == *rhs.get_key() && *value == *rhs.get_value();
 }
 std::ostream &DBData::out(std::ostream &ostream) const {
-  ostream << "<BPTreeData>\nkey: " << key << "\nvalue: " << value;
+  ostream << "BPTreeData{\nkey: " << *key << "\nvalue: " << *value << "\n}";
   return ostream;
 }
 DBDataFactory::DBDataFactory(SchemaShared schema_shared) : schema_shared(std::move(schema_shared)) {

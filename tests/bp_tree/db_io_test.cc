@@ -8,7 +8,7 @@
 TEST(DBPointerTest, DeserializeTest){
   DBPointer db_pointer;
 
-  DBPointer origin("test1twejhetj.db", 17834288);
+  DBPointer origin("test1twejhetj.db", 17834288, 98415);
   auto origin_binary = origin.serialize();
   db_pointer.deserialize(*origin_binary, 0).unwrap();
 

@@ -12,6 +12,7 @@
 #include <serializable.h>
 #include <data.h>
 #include <db_io.h>
+#include <ostream>
 
 template <typename Key, typename Value, typename Data>
 class DataNode;
@@ -53,7 +54,13 @@ using ValueShared = std::shared_ptr<Value>;
 
   bool operator==(const DataNode &rhs) const;
   bool operator!=(const DataNode &rhs) const;
-
+  friend std::ostream &operator<<(std::ostream &os, const DataNode &node) {
+    os << "DataNode{\nleft: " << node.left << ",\nright: " << node.right << ",\ndata: ";
+    for (auto& d: node.data){
+      os << "\n" << *d;
+    }
+    return os;
+  }
  private:
   friend class DataNodeFactory<Key, Value, Data>;
   explicit DataNode(std::unique_ptr<DataFactory<Key, Value, Data>> data_factory): data_factory(std::move(data_factory)) {}

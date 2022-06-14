@@ -11,6 +11,8 @@
 #include <stdexcept>
 #include <ostream>
 #include <cstdint>
+#include <fstream>
+#include <error.h>
 
 using BinaryIndex = unsigned long long int ;
 using Byte = std::uint8_t;
@@ -31,6 +33,8 @@ using BinaryUnique = std::unique_ptr<Binary>;
 class BinaryFactory {
  public:
   static BinaryUnique create(BinaryIndex length);
+  static BinaryUnique create(std::unique_ptr<Byte[]> byte_buffer, BinaryIndex length);
+  static BinaryUnique read(const std::string& file_name, BinaryIndex offset, BinaryIndex length);
 };
 
 class [[nodiscard]] Binary{
@@ -45,6 +49,8 @@ class [[nodiscard]] Binary{
   [[nodiscard]] Byte read_mem(BinaryIndex index) const;
   [[nodiscard]] Byte read_mem(BinaryIndex index1, BinaryIndex index2) const;
 
+  bool save(const std::string& file_name);
+
   BinaryUnique operator+(const Binary& binary_ref) const;
   friend std::ostream &operator<<(std::ostream &os, const Binary &binary);
 
@@ -55,9 +61,9 @@ class [[nodiscard]] Binary{
   BinaryIndex length;
 
   explicit Binary(BinaryIndex length);
+  Binary(std::unique_ptr<Byte[]> byte_buffer, BinaryIndex length);
   void verify_index(BinaryIndex index) const;
 };
-#define WRONG_BINARY BinaryFactory::create(0)
 
 int get_byte_count(unsigned long long size);
 std::vector<Byte> num_to_char_vec(unsigned long long int num);

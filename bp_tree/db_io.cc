@@ -19,7 +19,16 @@ Result<BinaryIndex, DeserializeError> DBPointer::deserialize(const Binary &binar
     valid_offset_bytes.push_back(binary.read_mem(index));
     index++;
   }
-  this->offset = byte_vec_to_num(valid_offset_bytes);
+  this->offset = (Offset)byte_vec_to_num(valid_offset_bytes);
+
+  auto length_byte_count = binary.read_mem(index);
+  index++;
+  std::vector<Byte> valid_length_bytes;
+  for (int i = 0; i < length_byte_count; i++){
+    valid_length_bytes.push_back(binary.read_mem(index));
+    index++;
+  }
+  this->length = (Offset) byte_vec_to_num(valid_length_bytes);
   return Ok(index);
 }
 BinaryUnique DBPointer::serialize() const {
@@ -40,29 +49,50 @@ BinaryUnique DBPointer::serialize() const {
     throw SerializeError("File is too large!");
   }
   auto offset_byte_count = (Byte)valid_offset_bytes.size();
-  auto binary = BinaryFactory::create(1 + file_name_byte_count + 1 + offset_byte_count);
+  auto length_to_chars = num_to_char_vec(length);
+  flag = false;
+  std::vector<Byte> valid_length_bytes;
+  for (auto &l: length_to_chars){
+    if (flag || l != 0){
+      valid_length_bytes.push_back(l);
+      flag = true;
+    }
+  }
+  if (valid_length_bytes.size() >= 256){
+    throw SerializeError("Length of pointer is too long!");
+  }
+  auto length_byte_count = (Byte)valid_length_bytes.size();
+
+  auto binary = BinaryFactory::create(1 + file_name_byte_count + 1 + offset_byte_count + 1 + length_byte_count);
   int index = 0;
   binary->set_mem(index, file_name_byte_count);
   index++;
-  for (int i = 0; i < file_name_byte_count; i++){
-    binary->set_mem(index, file_name[i]);
+  for (auto& f: file_name){
+    binary->set_mem(index, f);
     index++;
   }
   binary->set_mem(index, offset_byte_count);
   index++;
-  for (int i = 0; i < offset_byte_count; i++){
-    binary->set_mem(index, valid_offset_bytes[i]);
+  for (auto& offset_byte: valid_offset_bytes){
+    binary->set_mem(index, offset_byte);
+    index++;
+  }
+  binary->set_mem(index, length_byte_count);
+  index++;
+  for (auto& length_byte: valid_length_bytes){
+    binary->set_mem(index, length_byte);
     index++;
   }
   return binary;
 }
 std::ostream &operator<<(std::ostream &os, const DBPointer &pointer) {
-  os << "file_name: " << pointer.file_name << ", offset: " << pointer.offset;
+  os << "DBPointer{\nfile_name: " << pointer.file_name << ", offset: " << pointer.offset << ", length: " << pointer.length << "\n}";
   return os;
 }
 bool DBPointer::operator==(const DBPointer &rhs) const {
   return file_name == rhs.file_name &&
-      offset == rhs.offset;
+      offset == rhs.offset &&
+      length == rhs.length;
 }
 bool DBPointer::operator!=(const DBPointer &rhs) const {
   return !(rhs == *this);

@@ -5,7 +5,7 @@
 #ifndef CPPDATABASE_TESTS_BP_TREE_TEST_DATA_H_
 #define CPPDATABASE_TESTS_BP_TREE_TEST_DATA_H_
 
-#include <f_int.h>
+#include "type/f_int.h"
 
 class TestData: Data<Int, Int> {
  public:

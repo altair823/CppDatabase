@@ -57,7 +57,21 @@ BinaryUnique BinaryFactory::create(unsigned long long length) {
   std::unique_ptr<Binary> binary(new Binary(length));
   return binary;
 }
-
+BinaryUnique BinaryFactory::create(std::unique_ptr<Byte[]> byte_buffer, BinaryIndex length) {
+  std::unique_ptr<Binary> binary(new Binary(std::move(byte_buffer), length));
+  return binary;
+}
+BinaryUnique BinaryFactory::read(const std::string& file_name, BinaryIndex offset, BinaryIndex length) {
+  auto db_file = std::fstream(file_name, std::ios::binary | std::ios::in);
+  if (db_file.fail()){
+    throw NotFound("Cannot found DB file(name: " + file_name + ")!");
+  }
+  db_file.seekg((long long)offset, db_file.beg);
+  auto buffer = std::make_unique<Byte[]>(length);
+  db_file.read((char *)buffer.get(), (long)length);
+  auto binary = BinaryFactory::create(std::move(buffer), length);
+  return binary;
+}
 Binary::Binary(unsigned long long int length): length(length) {
   if (length == 0){
     data = nullptr;
@@ -65,7 +79,13 @@ Binary::Binary(unsigned long long int length): length(length) {
     data = std::make_unique<Byte[]>(length);
   }
 }
-
+Binary::Binary(std::unique_ptr<Byte[]> byte_buffer, BinaryIndex length): length(length) {
+  if (length == 0){
+    data = nullptr;
+  } else {
+    data = std::move(byte_buffer);
+  }
+}
 void Binary::set_mem(unsigned long long int index, Location_in_byte loc, const Byte &value) {
   verify_index(index);
   if (value > 15) {
@@ -127,6 +147,14 @@ Byte Binary::read_mem(BinaryIndex index1, BinaryIndex index2) const {
     result |= c << i;
   }
   return result;
+}
+bool Binary::save(const std::string& file_name) {
+  auto db_file = std::fstream(file_name, std::ios::binary | std::ios::app);
+  if (db_file.fail()){
+    return false;
+  }
+  db_file.write((char *)this->data.get(), (long)this->length);
+  return true;
 }
 BinaryUnique Binary::operator+(const Binary &binary_ref) const {
   auto result_binary = BinaryFactory::create(this->length + binary_ref.length);
