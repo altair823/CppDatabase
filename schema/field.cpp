@@ -20,3 +20,22 @@ bool Field::operator==(const Field &rhs) const {
 bool Field::operator!=(const Field &rhs) const {
   return !(rhs == *this);
 }
+bool Field::operator<(const Field &rhs) const {
+  if (name != rhs.name){
+    throw CannotConvert("Wrong field comparing!");
+  }
+  if (data < rhs.data) {
+    return true;
+  } else {
+    return false;
+  }
+}
+bool Field::operator>(const Field &rhs) const {
+  return rhs < *this;
+}
+bool Field::operator<=(const Field &rhs) const {
+  return !(rhs < *this);
+}
+bool Field::operator>=(const Field &rhs) const {
+  return !(*this < rhs);
+}

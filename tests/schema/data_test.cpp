@@ -7,7 +7,7 @@
 #include <f_string.h>
 #include <f_datetime.h>
 #include <record.h>
-#include <bp_tree_data.h>
+#include "bp_tree/data.h"
 #include "type.h"
 
 TEST(DataTest, SerializeTest){
@@ -22,10 +22,10 @@ TEST(DataTest, SerializeTest){
   record.set_field(std::make_shared<String>("key2"), "fk_str").unwrap();
   record.set_field(std::make_shared<DateTime>(2022, 5, 4, 17, 5, 20), "Created date").unwrap();
 
-  auto data = DBData(record);
+  auto data = Data(record);
   auto data_binary = data.serialize();
   auto new_record = Record(*schema);
-  auto new_data = DBData(new_record);
+  auto new_data = Data(new_record);
   new_data.deserialize(*data_binary, 0).unwrap();
   //std::cout<<*new_data;
   ASSERT_EQ(new_data, data);

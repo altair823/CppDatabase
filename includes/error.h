@@ -6,6 +6,7 @@
 #define CPPDATABASE_INCLUDES_TYPE_ERROR_H_
 
 #include <utility>
+#include <string>
 
 class Error{
  public:

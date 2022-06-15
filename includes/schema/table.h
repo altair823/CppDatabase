@@ -6,31 +6,31 @@
 #define CPPDATABASE_INCLUDES_RECORD_TABLE_H_
 
 #include <schema.h>
-#include <storage_interface.h>
 #include <ostream>
 #include <record.h>
+#include "bp_tree.h"
 
 class Table{
  public:
-  Table(SchemaShared schema, StorageShared<Field, Record> storage);
+  Table(SchemaShared schema, BPTreeShared storage);
   Result<bool, InsertionError> add_record(const Record& record);
 
 
   SchemaShared schema;
   friend std::ostream &operator<<(std::ostream &os, const Table &table);
-  StorageShared<Field, Record> storage;
+  BPTreeShared storage;
  private:
 };
 
 
-Table::Table(SchemaShared schema, StorageShared<Field, Record> storage)
+Table::Table(SchemaShared schema, BPTreeShared storage)
 : schema(std::move(schema)), storage(std::move(storage)){
 
 }
 
 Result<bool, InsertionError> Table::add_record(const Record& record){
   auto key = record.get_pk_field().unwrap();
-  if (!storage->insert(key, record, false)){
+  if (!storage->insert(std::make_shared<Field>(key), std::make_shared<Record>(record), false)){
     return Err(InsertionError("Cannot insert record in the storage!"));
   }
   return Ok(true);

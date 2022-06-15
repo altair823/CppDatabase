@@ -25,6 +25,10 @@ class [[nodiscard]] Field : public Serializable{
   friend std::ostream &operator<<(std::ostream &os, const Field &field);
   bool operator==(const Field &rhs) const;
   bool operator!=(const Field &rhs) const;
+  bool operator<(const Field &rhs) const;
+  bool operator>(const Field &rhs) const;
+  bool operator<=(const Field &rhs) const;
+  bool operator>=(const Field &rhs) const;
  private:
   TypeShared data;
   std::string name;

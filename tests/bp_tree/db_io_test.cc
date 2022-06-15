@@ -3,7 +3,7 @@
 //
 
 #include <gtest/gtest.h>
-#include "storage/bp_tree/db_io.h"
+#include "bp_tree/db_io.h"
 
 TEST(DBPointerTest, DeserializeTest){
   DBPointer db_pointer;
