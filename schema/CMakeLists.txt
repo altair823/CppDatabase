@@ -2,7 +2,6 @@ add_library(
         schema
         record.cc
         schema.cc
-        ../bp_tree/data.cc
         field.cpp
 )
 

@@ -4,14 +4,16 @@
 
 #include <bp_tree.h>
 
+#include <utility>
 
-BPTree::BPTree(SchemaShared schema): head(nullptr), schema(std::move(schema)) {
+
+BPTree::BPTree(SchemaShared schema, std::string key_field_name): head(nullptr), schema(std::move(schema)), key_field_name(std::move(key_field_name)) {
 }
 bool BPTree::insert(Key key, Value value, bool to_override) {
   if (this->is_empty()){
-    head = IndexNodeFactory::create(schema);
-    auto left_data = DataNodeFactory::create(std::make_unique<DataFactory>(schema));
-    auto right_data = DataNodeFactory::create(std::make_unique<DataFactory>(schema));
+    head = IndexNodeFactory::create(schema, key_field_name);
+    auto left_data = DataNodeFactory::create(schema, key_field_name);
+    auto right_data = DataNodeFactory::create(schema, key_field_name);
     head->push_back_key(key);
   }
   return true;

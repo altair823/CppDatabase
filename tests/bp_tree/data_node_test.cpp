@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 #include <data_node.h>
-#include <data.h>
-#include "bp_tree/data.h"
+#include <schema.h>
+#include <record.h>
 #include <f_int.h>
 
 
@@ -34,11 +34,11 @@ TEST(DataNodeTest, SerializeTest){
       ->set_field(TypeKind::DATETIME, "Created date").unwrap()
       ->build().unwrap();
 
-  auto data1 = std::make_unique<Data>(Data(Record(*schema)));
-  auto data2 = std::make_unique<Data>(Data(Record(*schema)));
-  auto data3 = std::make_unique<Data>(Data(Record(*schema)));
-  auto data4 = std::make_unique<Data>(Data(Record(*schema)));
-  auto data_node = DataNodeFactory::create(std::make_unique<DataFactory>(schema));
+  auto data1 = std::make_unique<Record>(schema);
+  auto data2 = std::make_unique<Record>(schema);
+  auto data3 = std::make_unique<Record>(schema);
+  auto data4 = std::make_unique<Record>(schema);
+  auto data_node = DataNodeFactory::create(schema, "pk_str");
   data_node->push_back(std::move(data1));
   data_node->push_back(std::move(data2));
   data_node->push_back(std::move(data3));
@@ -46,7 +46,7 @@ TEST(DataNodeTest, SerializeTest){
 
   auto binary = data_node->serialize();
 
-  auto new_data_node = DataNodeFactory::create(std::make_unique<DataFactory>(schema));
+  auto new_data_node = DataNodeFactory::create(schema, "pk_str");
   new_data_node->deserialize(*binary, 0).unwrap();
 
   ASSERT_EQ(*data_node, *new_data_node);

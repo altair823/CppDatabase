@@ -14,12 +14,12 @@ TEST(TableTest, InsertTest){
       ->set_field(TypeKind::DATETIME, "datetime1", KeyType::FK).unwrap()
       ->set_field(TypeKind::DATETIME, "datetime2").unwrap()->build().unwrap();
 
-  Table table(schema, std::make_shared<BPTree>(schema));
+  Table table(schema, std::make_shared<BPTree>(schema, "string1"));
 
-  auto record = std::make_unique<Record>(*schema);
-  record->set_field(std::make_shared<String>("stringggg"), "string1").unwrap();
-  record->set_field(std::make_shared<DateTime>(20, 3, 14, 23, 25, 5), "datetime1").unwrap();
-  record->set_field(std::make_shared<DateTime>(12, 2, 23, 2, 35, 55), "datetime2").unwrap();
+  auto record = std::make_unique<Record>(schema);
+  record->set_field(std::make_shared<String>("stringggg"), "string1");
+  record->set_field(std::make_shared<DateTime>(20, 3, 14, 23, 25, 5), "datetime1");
+  record->set_field(std::make_shared<DateTime>(12, 2, 23, 2, 35, 55), "datetime2");
 
   table.add_record(*record).unwrap();
 

@@ -22,7 +22,6 @@ add_executable(
         schema/record_test.cc
         schema/schema_test.cc
         schema/table_test.cpp
-        schema/data_test.cpp
 
         type/f_datetime_test.cc
         type/f_string_test.cc

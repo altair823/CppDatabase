@@ -5,8 +5,6 @@
 #include <gtest/gtest.h>
 #include <bp_tree/bp_tree.h>
 #include "record.h"
-#include "data.h"
-
 TEST(BPTreeTest, InstantiateTest){
 
 }

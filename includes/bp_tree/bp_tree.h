@@ -7,13 +7,12 @@
 
 #include <utility>
 
-#include "data.h"
 #include "index_node.h"
 #include "data_node.h"
 
 class BPTree {
  public:
-  explicit BPTree(SchemaShared schema);
+  explicit BPTree(SchemaShared schema, std::string key_field_name);
   bool is_empty();
   bool insert(Key key, Value value, bool to_override);
   Result<Value, NotFound> search(Key key);
@@ -22,6 +21,7 @@ class BPTree {
  private:
   IndexNodeUnique head;
   SchemaShared schema;
+  std::string key_field_name;
 };
 
 using BPTreeShared = std::shared_ptr<BPTree>;

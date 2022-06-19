@@ -30,7 +30,7 @@ Table::Table(SchemaShared schema, BPTreeShared storage)
 
 Result<bool, InsertionError> Table::add_record(const Record& record){
   auto key = record.get_pk_field().unwrap();
-  if (!storage->insert(std::make_shared<Field>(key), std::make_shared<Record>(record), false)){
+  if (!storage->insert(std::move(key), std::make_shared<Record>(record), false)){
     return Err(InsertionError("Cannot insert record in the storage!"));
   }
   return Ok(true);

@@ -4,31 +4,39 @@
 
 #include <data_node.h>
 
+#include <utility>
 
-DataNodeShared DataNodeFactory::create(std::unique_ptr<DataFactory> data_factory) {
-  DataNodeShared new_data_node(new DataNode(std::move(data_factory)));
+
+DataNodeShared DataNodeFactory::create(const SchemaShared& schema, std::string key_field_name) {
+  DataNodeShared new_data_node(new DataNode(schema, std::move(key_field_name)));
   return new_data_node;
 }
-void DataNode::insert(int index, DataUnique new_data) {
+void DataNode::insert(int index, Value new_data) {
   data.insert(data.begin() + index, std::move(new_data));
 }
-void DataNode::push_back(DataUnique new_data) {
+void DataNode::push_back(Value new_data) {
   data.push_back(std::move(new_data));
 }
-int DataNode::search(Key key) const {
-  auto iterator = std::lower_bound(data.begin(), data.end(), key, [&](const DataUnique &data_it, const Key &key){
-    return *(data_it->get_key()) < *key;
+int DataNode::search(const Key& key) const {
+  auto iterator = std::lower_bound(data.begin(), data.end(), key, [&](const Value &data_it, const Key &key){
+    return data_it->get_field(key_field_name).unwrap() < key;
   });
-  return std::distance(data.begin(), iterator);
+  return (int)std::distance(data.begin(), iterator);
+}
+void DataNode::remove(int index) {
+  data.erase(data.begin() + index);
 }
 BinaryUnique DataNode::serialize() const {
   Byte node_type = static_cast<Byte>(NodeType::DataNode);
   if (data.size() >= 4096){
     throw std::range_error("Too many data(over 4096)!");
   }
-  int data_count = data.size();
+  int data_count = (int)data.size();
   std::vector<BinaryUnique> binaries;
   BinaryIndex total_size = 2;
+  auto key_binary = String(key_field_name).serialize();
+  total_size += key_binary->get_length();
+  binaries.push_back(std::move(key_binary));
 
   for (const auto &d: data){
     binaries.push_back(d->serialize());
@@ -58,15 +66,18 @@ Result<BinaryIndex, DeserializeError> DataNode::deserialize(const Binary &binary
   index++;
   data_count += binary.read_mem(index);
   index++;
+  auto temp_str = String();
+  index = temp_str.deserialize(binary, index).unwrap();
+  key_field_name = temp_str.get_string();
   for (int i = 0; i < data_count; i++){
-    auto new_data = data_factory->create_data();
+    auto new_data = std::make_shared<Record>(schema);
     index = new_data->deserialize(binary, index).unwrap();
     data.push_back(std::move(new_data));
   }
   return Ok(index);
 }
 bool DataNode::operator==(const DataNode &rhs) const {
-  if (left != rhs.left || right != rhs.right || data.size() != rhs.data.size()){
+  if (left != rhs.left || right != rhs.right || data.size() != rhs.data.size() || key_field_name != rhs.key_field_name){
     return false;
   } else {
     for (int i = 0; i < data.size(); i++){

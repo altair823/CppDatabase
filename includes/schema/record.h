@@ -23,24 +23,26 @@
 
 class [[nodiscard]] Record : public Serializable{
  public:
-  explicit Record(const Schema& schema);
+  explicit Record(SchemaShared schema);
 
-  Result<bool, AlreadyExist> set_field(const TypeShared& data, const std::string& field_name);
-  [[nodiscard]] Result<Field, NotFound> get_field(const std::string& field_name) const;
-  [[nodiscard]] Result<Field, NotFound> get_pk_field() const;
+  bool set_field(const TypeShared& data, const std::string& field_name);
+  [[nodiscard]] Result<FieldShared, NotFound> get_field(const std::string& field_name) const;
+  [[nodiscard]] Result<FieldShared, NotFound> get_pk_field() const;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
   [[nodiscard]] BinaryUnique serialize() const override;
 
   friend std::ostream &operator<<(std::ostream &os, const Record &schema);
   bool operator==(const Record &rhs) const;
 
-  Field pk;
-  std::vector<Field> fks;
-  std::vector<Field> other_fields;
+  SchemaShared schema;
+  FieldShared pk;
+  std::vector<FieldShared> fks;
+  std::vector<FieldShared> other_fields;
 };
 
 typedef std::shared_ptr<Record> RecordShared;
 
-Result<TypeShared, CannotConvert> type_to_field(TypeKind type);
+bool field_comparator(const FieldShared& fk1, const FieldShared& fk2);
+
 
 #endif //CPPDATABASE_INCLUDES_SCHEMA_RECORD_H_

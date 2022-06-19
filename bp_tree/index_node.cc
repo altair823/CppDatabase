@@ -3,18 +3,20 @@
 //
 #include <index_node.h>
 
+#include <utility>
 
-IndexNodeUnique IndexNodeFactory::create(const SchemaShared& schema, std::vector<Key> keys, std::vector<DBPointer> pointers) {
-  IndexNodeUnique index_node(new IndexNode(schema, keys, pointers));
+
+IndexNodeUnique IndexNodeFactory::create(const SchemaShared& schema, std::string key_field_name, std::vector<Key> keys, std::vector<DBPointer> pointers) {
+  IndexNodeUnique index_node(new IndexNode(schema, std::move(key_field_name), std::move(keys), std::move(pointers)));
   return index_node;
 }
-IndexNodeUnique IndexNodeFactory::create(const SchemaShared& schema) {
-  IndexNodeUnique index_node(new IndexNode(schema));
+IndexNodeUnique IndexNodeFactory::create(const SchemaShared& schema, std::string key_field_name) {
+  IndexNodeUnique index_node(new IndexNode(schema, std::move(key_field_name)));
   return index_node;
 }
 
-IndexNode::IndexNode(SchemaShared schema, std::vector<Key> keys, std::vector<DBPointer> pointers)
-: keys(std::move(keys)), pointers(std::move(pointers)), is_node_leaf(true), data_schema(std::move(schema)) {
+IndexNode::IndexNode(SchemaShared schema, std::string key_field_name, std::vector<Key> keys, std::vector<DBPointer> pointers)
+: keys(std::move(keys)), pointers(std::move(pointers)), is_node_leaf(true), schema(std::move(schema)), key_field_name(std::move(key_field_name)) {
 
 }
 BinaryUnique IndexNode::serialize() const {
@@ -65,7 +67,7 @@ Result<BinaryIndex, DeserializeError> IndexNode::deserialize(const Binary &binar
   int degree = (binary.read_mem(0, Location_in_byte::SecondFourBit) << 4) + binary.read_mem(1);
   BinaryIndex index = 2;
   for (int i = 0; i < degree - 1; i++){
-    Key new_key;
+    Key new_key = std::make_shared<Field>(schema->get_field(key_field_name).unwrap());
     index = new_key->deserialize(binary, index).unwrap();
     keys.push_back(new_key);
   }
@@ -77,16 +79,20 @@ Result<BinaryIndex, DeserializeError> IndexNode::deserialize(const Binary &binar
   return Ok(index);
 }
 bool IndexNode::operator==(const IndexNode &rhs) const {
-  return keys == rhs.keys &&
-      pointers == rhs.pointers &&
-      is_node_leaf == rhs.is_node_leaf;
+  if (is_node_leaf != rhs.is_node_leaf || keys.size() != rhs.keys.size() || pointers != rhs.pointers) {
+    return false;
+  }
+  if (!std::equal(keys.begin(), keys.end(), rhs.keys.begin(), field_comparator)){
+    return false;
+  }
+  return true;
 }
 IndexNodeUnique IndexNode::get_index_child(int index) const {
   if (is_node_leaf){
     throw NotFound("The Node is leaf! Does not have any pointers.");
   }
   auto binary = BinaryFactory::read(pointers[index].get_file_name(), pointers[index].get_offset(), pointers[index].get_length());
-  auto new_index_node = IndexNodeFactory::create(data_schema);
+  auto new_index_node = IndexNodeFactory::create(schema, key_field_name);
   new_index_node->deserialize(*binary, 0).unwrap();
   return new_index_node;
 }
@@ -95,7 +101,7 @@ DataNodeShared IndexNode::get_data_child(int index) const {
     throw NotFound("The Node is not leaf! Does not have any data nodes.");
   }
   auto binary = BinaryFactory::read(pointers[index].get_file_name(), pointers[index].get_offset(), pointers[index].get_length());
-  auto new_data_node = DataNodeFactory::create(std::make_unique<DataFactory>(data_schema));
+  auto new_data_node = DataNodeFactory::create(schema, key_field_name);
   new_data_node->deserialize(*binary, 0).unwrap();
   return new_data_node;
 }

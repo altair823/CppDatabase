@@ -9,10 +9,16 @@
 #include <algorithm>
 #include "error.h"
 #include "result.h"
-#include "serializable.h"
-#include "data.h"
+#include <serializable.h>
 #include "db_io.h"
+#include <field.h>
+#include <record.h>
+#include <schema.h>
 #include <ostream>
+#include <utility>
+
+using Key = FieldShared;
+using Value = RecordShared;
 
 class DataNode;
 
@@ -20,30 +26,27 @@ using DataNodeShared = std::shared_ptr<DataNode>;
 
 class DataNodeFactory {
  public:
-  static DataNodeShared create(std::unique_ptr<DataFactory> data_factory);
+  static DataNodeShared create(const SchemaShared& schema, std::string key_field_name);
 };
 
 class DataNode : public Serializable{
  public:
-using DataUnique = std::unique_ptr<Data>;
-using KeyShared = std::shared_ptr<Key>;
-using ValueShared = std::shared_ptr<Value>;
-  [[nodiscard]] Key get_key(int index) const {return data[index]->get_key();}
-  [[nodiscard]] Value get_value(int index) const {return data[index]->get_value();}
-  DataUnique pop_data(int index) {return std::move(data[index]);}
+  [[nodiscard]] Key get_key(int index) const {return data[index]->get_field(key_field_name).unwrap();}
+  [[nodiscard]] Value get_value(int index) const {return data[index];}
+  void remove(int index);
   [[nodiscard]] int get_data_count() const {return (int)data.size();}
 
-  void set_left_sibling(DBPointer data_node) {left = data_node;};
-  void set_right_sibling(DBPointer data_node) {right = data_node;};
-  DBPointer get_left_sibling() const {return left;}
-  DBPointer get_right_sibling() const {return right;}
+  void set_left_sibling(DBPointer data_node) {left = std::move(data_node);};
+  void set_right_sibling(DBPointer data_node) {right = std::move(data_node);};
+  [[nodiscard]] DBPointer get_left_sibling() const {return left;}
+  [[nodiscard]] DBPointer get_right_sibling() const {return right;}
 
   int in_begin() {return 0;}
   int in_end() {return (int)data.size() - 1;}
 
-  void insert(int index, DataUnique new_data);
-  void push_back(DataUnique new_data);
-  int search(Key key) const;
+  void insert(int index, Value new_data);
+  void push_back(Value new_data);
+  [[nodiscard]] int search(const Key& key) const;
 
   [[nodiscard]] BinaryUnique serialize() const override;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
@@ -59,11 +62,11 @@ using ValueShared = std::shared_ptr<Value>;
   }
  private:
   friend class DataNodeFactory;
-  explicit DataNode(std::unique_ptr<DataFactory> data_factory): data_factory(std::move(data_factory)) {}
+  explicit DataNode(SchemaShared schema, std::string key_field_name) : schema(std::move(schema)), key_field_name(std::move(key_field_name)) {}
 
+  SchemaShared schema;
   DBPointer left, right;
-  std::vector<DataUnique> data;
-
-  std::unique_ptr<DataFactory> data_factory;
+  std::vector<Value> data;
+  std::string key_field_name;
 };
 #endif //CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DATA_NODE_H_

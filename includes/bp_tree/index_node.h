@@ -23,8 +23,8 @@ using IndexNodeUnique = std::unique_ptr<IndexNode>;
 
 class IndexNodeFactory {
  public:
-  static IndexNodeUnique create(const SchemaShared& schema, std::vector<Key> keys, std::vector<DBPointer> pointers);
-  static IndexNodeUnique create(const SchemaShared& schema);
+  static IndexNodeUnique create(const SchemaShared& schema, std::string key_field_name, std::vector<Key> keys, std::vector<DBPointer> pointers);
+  static IndexNodeUnique create(const SchemaShared& schema, std::string key_field_name);
 };
 
 class IndexNode : public Serializable {
@@ -60,9 +60,10 @@ class IndexNode : public Serializable {
 
  private:
   friend class IndexNodeFactory;
-  SchemaShared data_schema;
-  IndexNode(SchemaShared schema) : is_node_leaf(true), data_schema(std::move(schema)) {};
-  IndexNode(SchemaShared schema, std::vector<Key> keys, std::vector<DBPointer> pointers);
+  SchemaShared schema;
+  std::string key_field_name;
+  explicit IndexNode(SchemaShared schema, std::string key_field_name) : is_node_leaf(true), schema(std::move(schema)), key_field_name(key_field_name) {};
+  IndexNode(SchemaShared schema, std::string key_field_name, std::vector<Key> keys, std::vector<DBPointer> pointers);
   std::vector<Key> keys;
   std::vector<DBPointer> pointers;
   bool is_node_leaf;

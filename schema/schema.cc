@@ -203,9 +203,6 @@ Result<SchemaShared, NotFound> SchemaBuilder::build(){
   if (!is_pk_exist){
     return Err(NotFound("The PK is not set!"));
   }
-  else if (fks.empty() && other_fields.empty()){
-    return Err(NotFound("There are no fields to build!"));
-  }
   SchemaShared new_schema = std::make_shared<Schema>(schema_name);
   new_schema->pk = pk;
   new_schema->fks.assign(fks.begin(), fks.end());
