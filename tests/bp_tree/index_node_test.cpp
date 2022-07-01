@@ -36,9 +36,9 @@ TEST(IndexNodeTest, IndexChildTest){
       .unwrap()->build().unwrap();
 
   std::vector<FieldShared> keys;
-  keys.push_back(std::make_shared<Field>("pk", std::make_shared<String>("key1")));
-  keys.push_back(std::make_shared<Field>("pk", std::make_shared<String>("key2")));
-  keys.push_back(std::make_shared<Field>("pk", std::make_shared<String>("key3")));
+  keys.push_back(FieldFactory::create("pk", std::make_shared<String>("key1")));
+  keys.push_back(FieldFactory::create("pk", std::make_shared<String>("key2")));
+  keys.push_back(FieldFactory::create("pk", std::make_shared<String>("key3")));
   std::vector<DBPointer> pointers;
   pointers.emplace_back("db1.txt", 0, 0);
   pointers.emplace_back("db2.txt", 3, 5);
@@ -50,7 +50,7 @@ TEST(IndexNodeTest, IndexChildTest){
   parent_node->set_leaf(NOT_LEAF);
   auto index_binary = index_node->serialize();
   std::filesystem::remove(test_filename);
-  index_binary->save(test_filename);
+  index_binary->save(test_filename).unwrap();
   auto db_pointer = DBPointer(test_filename, 0, (long)index_binary->get_length());
   parent_node->push_back_pointer(db_pointer);
   auto read_node = parent_node->get_index_child(0);
@@ -78,7 +78,7 @@ TEST(IndexNodeTest, DataChildTest){
   data_node->push_back(std::move(data4));
   auto data_binary = data_node->serialize();
   std::filesystem::remove(test_filename);
-  data_binary->save(test_filename);
+  data_binary->save(test_filename).unwrap();
   auto db_pointer = DBPointer(test_filename, 0, (long)data_binary->get_length());
 
   auto parent_node = IndexNodeFactory::create(schema, "pk_str");

@@ -12,9 +12,11 @@
 #include <ostream>
 #include <cstdint>
 #include <fstream>
+#include <filesystem>
 #include <error.h>
+#include "result.h"
 
-using BinaryIndex = unsigned long long int ;
+using BinaryIndex = long long int ;
 using Byte = std::uint8_t;
 using int8 = std::int8_t; // char
 using int16 = std::int16_t; // short
@@ -26,6 +28,12 @@ enum class Location_in_byte {
   SecondFourBit,
 };
 
+struct Metadata{
+  Metadata(BinaryIndex offset, BinaryIndex length): offset(offset), length(length) {}
+  BinaryIndex offset;
+  BinaryIndex length;
+};
+
 class Binary;
 
 using BinaryUnique = std::unique_ptr<Binary>;
@@ -34,7 +42,7 @@ class BinaryFactory {
  public:
   static BinaryUnique create(BinaryIndex length);
   static BinaryUnique create(std::unique_ptr<Byte[]> byte_buffer, BinaryIndex length);
-  static BinaryUnique read(const std::string& file_name, BinaryIndex offset, BinaryIndex length);
+  static BinaryUnique read(const std::filesystem::path& file, BinaryIndex offset, BinaryIndex length);
 };
 
 class [[nodiscard]] Binary{
@@ -49,7 +57,7 @@ class [[nodiscard]] Binary{
   [[nodiscard]] Byte read_mem(BinaryIndex index) const;
   [[nodiscard]] Byte read_mem(BinaryIndex index1, BinaryIndex index2) const;
 
-  bool save(const std::string& file_name);
+  Result<Metadata, NotFound> save(const std::filesystem::path& file);
 
   BinaryUnique operator+(const Binary& binary_ref) const;
   friend std::ostream &operator<<(std::ostream &os, const Binary &binary);

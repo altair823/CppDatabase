@@ -6,7 +6,7 @@
 #define CPPDATABASE_INCLUDES_SCHEMA_RECORD_H_
 
 #include <utility>
-#include <vector>
+#include <set>
 #include <utility>
 #include <type.h>
 #include <mem_core.h>
@@ -36,8 +36,8 @@ class [[nodiscard]] Record : public Serializable{
 
   SchemaShared schema;
   FieldShared pk;
-  std::vector<FieldShared> fks;
-  std::vector<FieldShared> other_fields;
+  std::set<FieldShared> fks;
+  std::set<FieldShared> other_fields;
 };
 
 typedef std::shared_ptr<Record> RecordShared;

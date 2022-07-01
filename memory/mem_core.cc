@@ -53,7 +53,7 @@ unsigned long long byte_vec_to_num(std::vector<Byte> char_vec) {
   return result;
 }
 
-BinaryUnique BinaryFactory::create(unsigned long long length) {
+BinaryUnique BinaryFactory::create(BinaryIndex length) {
   std::unique_ptr<Binary> binary(new Binary(length));
   return binary;
 }
@@ -61,10 +61,10 @@ BinaryUnique BinaryFactory::create(std::unique_ptr<Byte[]> byte_buffer, BinaryIn
   std::unique_ptr<Binary> binary(new Binary(std::move(byte_buffer), length));
   return binary;
 }
-BinaryUnique BinaryFactory::read(const std::string& file_name, BinaryIndex offset, BinaryIndex length) {
-  auto db_file = std::fstream(file_name, std::ios::binary | std::ios::in);
+BinaryUnique BinaryFactory::read(const std::filesystem::path& file, BinaryIndex offset, BinaryIndex length) {
+  auto db_file = std::fstream(file, std::ios::binary | std::ios::in);
   if (db_file.fail()){
-    throw NotFound("Cannot found DB file(name: " + file_name + ")!");
+    throw NotFound("Cannot found DB file(name: " + file.string() + ")!");
   }
   db_file.seekg((long long)offset, db_file.beg);
   auto buffer = std::make_unique<Byte[]>(length);
@@ -72,7 +72,7 @@ BinaryUnique BinaryFactory::read(const std::string& file_name, BinaryIndex offse
   auto binary = BinaryFactory::create(std::move(buffer), length);
   return binary;
 }
-Binary::Binary(unsigned long long int length): length(length) {
+Binary::Binary(BinaryIndex length): length(length) {
   if (length == 0){
     data = nullptr;
   } else {
@@ -86,7 +86,7 @@ Binary::Binary(std::unique_ptr<Byte[]> byte_buffer, BinaryIndex length): length(
     data = std::move(byte_buffer);
   }
 }
-void Binary::set_mem(unsigned long long int index, Location_in_byte loc, const Byte &value) {
+void Binary::set_mem(BinaryIndex index, Location_in_byte loc, const Byte &value) {
   verify_index(index);
   if (value > 15) {
     throw std::overflow_error("The value is 16 or higher! ");
@@ -102,11 +102,11 @@ void Binary::set_mem(unsigned long long int index, Location_in_byte loc, const B
     }
   }
 }
-void Binary::set_mem(unsigned long long int index, const Byte &value) {
+void Binary::set_mem(BinaryIndex index, const Byte &value) {
   verify_index(index);
   data[index] = value;
 }
-void Binary::set_mem(unsigned long long int index1, unsigned long long int index2, const Byte &value) {
+void Binary::set_mem(BinaryIndex index1, BinaryIndex index2, const Byte &value) {
   verify_index(index1);
   verify_index(index2);
   std::bitset<8> y(value);
@@ -148,13 +148,14 @@ Byte Binary::read_mem(BinaryIndex index1, BinaryIndex index2) const {
   }
   return result;
 }
-bool Binary::save(const std::string& file_name) {
-  auto db_file = std::fstream(file_name, std::ios::binary | std::ios::app);
+Result<Metadata, NotFound> Binary::save(const std::filesystem::path& file) {
+  auto db_file = std::fstream(file, std::ios::binary | std::ios::app);
   if (db_file.fail()){
-    return false;
+    return Err(NotFound("Cannot found target file!"));
   }
+  BinaryIndex offset = db_file.tellg();
   db_file.write((char *)this->data.get(), (long)this->length);
-  return true;
+  return Ok(Metadata(offset, this->length));
 }
 BinaryUnique Binary::operator+(const Binary &binary_ref) const {
   auto result_binary = BinaryFactory::create(this->length + binary_ref.length);

@@ -8,12 +8,12 @@
 #include "type.h"
 
 Record::Record(SchemaShared _schema) : schema(std::move(_schema)) {
-  pk = std::make_shared<Field>(schema->get_pk());
+  pk = FieldFactory::create(schema->get_pk());
   for (auto& fk: schema->get_fks()){
-    fks.push_back(std::make_shared<Field>(fk));
+    fks.insert(FieldFactory::create(fk));
   }
   for (auto& f: schema->get_other_fields()){
-    other_fields.push_back(std::make_shared<Field>(f));
+    other_fields.insert(FieldFactory::create(f));
   }
 }
 
@@ -32,7 +32,6 @@ bool Record::set_field(const TypeShared& data, const std::string& field_name) {
   });
   if (fk_it != fks.end()){
     (*fk_it)->set_data(data);
-    std::sort(fks.begin(), fks.end());
     return true;
   }
 
@@ -46,7 +45,6 @@ bool Record::set_field(const TypeShared& data, const std::string& field_name) {
   });
   if (it != other_fields.end()){
     (*it)->set_data(data);
-    std::sort(other_fields.begin(), other_fields.end());
     return true;
   } else {
     return false;
@@ -98,13 +96,11 @@ std::ostream &operator<<(std::ostream &os, const Record &record) {
 }
 
 bool Record::operator==(const Record &rhs) const {
-  if (*pk != *rhs.pk || this->other_fields.size() != rhs.other_fields.size() || fks.size() != rhs.fks.size()){
-    return false;
-  }
-  if (!std::equal(fks.begin(), fks.end(), rhs.fks.begin(), field_comparator)){
-    return false;
-  }
-  if (!std::equal(other_fields.begin(), other_fields.end(), rhs.other_fields.begin(), field_comparator)){
+  if (*pk != *rhs.pk
+  || this->other_fields.size() != rhs.other_fields.size()
+  || this->fks.size() != rhs.fks.size()
+  || !std::equal(this->other_fields.begin(), this->other_fields.end(), rhs.other_fields.begin(), field_comparator)
+  || !std::equal(fks.begin(), fks.end(), rhs.fks.begin(), field_comparator)){
     return false;
   }
   return true;

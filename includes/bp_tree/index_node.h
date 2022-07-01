@@ -41,6 +41,12 @@ class IndexNode : public Serializable {
   void push_back_key(const Key& key);
   void push_back_pointer(const DBPointer& pointer);
 
+  void erase_key(int index);
+  void erase_pointer(int index);
+
+  int search_key(const Key& key);
+
+
   [[nodiscard]] BinaryUnique serialize() const override;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
   bool operator==(const IndexNode &rhs) const;

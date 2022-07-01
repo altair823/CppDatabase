@@ -3,15 +3,17 @@
 //
 #include "db_io.h"
 
-Result<BinaryIndex, DeserializeError> DBPointer::deserialize(const Binary &binary, unsigned long long int start_index) {
+Result<BinaryIndex, DeserializeError> DBPointer::deserialize(const Binary &binary, BinaryIndex start_index) {
   BinaryIndex index = start_index;
   auto file_name_byte_count = binary.read_mem(index);
   index++;
+  std::string temp;
   for (int i = 0; i < file_name_byte_count; i++){
     char b = (char)binary.read_mem(index);
-    file_name.push_back((char)b);
+    temp.push_back((char)b);
     index++;
   }
+  file = std::filesystem::path(temp);
   auto offset_byte_count = binary.read_mem(index);
   index++;
   std::vector<Byte> valid_offset_bytes;
@@ -32,7 +34,7 @@ Result<BinaryIndex, DeserializeError> DBPointer::deserialize(const Binary &binar
   return Ok(index);
 }
 BinaryUnique DBPointer::serialize() const {
-  auto file_name_byte_count = (int) file_name.size();
+  auto file_name_byte_count = (int) file.string().size();
   if (file_name_byte_count > 225){
     throw SerializeError("Too long file name!");
   }
@@ -67,7 +69,7 @@ BinaryUnique DBPointer::serialize() const {
   int index = 0;
   binary->set_mem(index, file_name_byte_count);
   index++;
-  for (auto& f: file_name){
+  for (auto& f: file.string()){
     binary->set_mem(index, f);
     index++;
   }
@@ -86,11 +88,11 @@ BinaryUnique DBPointer::serialize() const {
   return binary;
 }
 std::ostream &operator<<(std::ostream &os, const DBPointer &pointer) {
-  os << "DBPointer{\nfile_name: " << pointer.file_name << ", offset: " << pointer.offset << ", length: " << pointer.length << "\n}";
+  os << "DBPointer{\nfile_name: " << pointer.file << ", offset: " << pointer.offset << ", length: " << pointer.length << "\n}";
   return os;
 }
 bool DBPointer::operator==(const DBPointer &rhs) const {
-  return file_name == rhs.file_name &&
+  return file == rhs.file &&
       offset == rhs.offset &&
       length == rhs.length;
 }

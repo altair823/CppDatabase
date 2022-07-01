@@ -4,6 +4,8 @@
 
 #include <field.h>
 
+#include <utility>
+
 BinaryUnique Field::serialize() const {
   return data->serialize();
 }
@@ -58,4 +60,20 @@ Result<TypeShared, CannotConvert> type_to_field(TypeKind type){
     default: return Err(CannotConvert("Wrong type error!"));
   }
   return Err(CannotConvert("Wrong type error!"));
+}
+FieldShared FieldFactory::create() {
+  std::shared_ptr<Field> new_field(new Field());
+  return new_field;
+}
+FieldShared FieldFactory::create(const FieldSchema &field_schema) {
+  std::shared_ptr<Field> new_field(new Field(field_schema));
+  return new_field;
+}
+FieldShared FieldFactory::create(std::string name) {
+  std::shared_ptr<Field> new_field(new Field(std::move(name)));
+  return new_field;
+}
+FieldShared FieldFactory::create(std::string name, TypeShared data) {
+  std::shared_ptr<Field> new_field(new Field(std::move(name), std::move(data)));
+  return new_field;
 }

@@ -107,4 +107,5 @@ TEST(RecordTest, DeserializeTest){
   //std::cout<<*schema_unique<<std::endl;
 
   ASSERT_EQ(record, deserialized_record);
+  std::cout<<record<<std::endl<<deserialized_record<<std::endl;
 }

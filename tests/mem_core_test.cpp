@@ -21,7 +21,7 @@ TEST(BinaryTest, OperatorTest){
 TEST(BinaryTest, SaveTest){
   auto datetime = DateTime(20, 12, 30, 9, 32, 54);
   auto binary = datetime.serialize();
-  ASSERT_TRUE(binary->save("testb"));
+  binary->save("testb").unwrap();
   auto new_binary = BinaryFactory::read("testb", 0, binary->get_length());
   auto new_datetime = DateTime();
   new_datetime.deserialize(*new_binary, 0).unwrap();

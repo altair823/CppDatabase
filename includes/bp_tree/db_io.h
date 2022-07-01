@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include <utility>
+#include <filesystem>
 #include "mem_core.h"
 #include "result.h"
 #include "error.h"
@@ -24,17 +25,17 @@ enum class NodeType {
 class DBPointer : public Serializable {
  public:
   DBPointer(): offset(0), length(0) {}
-  DBPointer(std::string file, Offset offset, Offset length) : file_name(std::move(file)), offset(offset), length(length) {}
+  DBPointer(std::filesystem::path file, Offset offset, Offset length) : file(std::move(file)), offset(offset), length(length) {}
   [[nodiscard]] BinaryUnique serialize() const override;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
-  [[nodiscard]] std::string get_file_name() const {return file_name;}
+  [[nodiscard]] std::string get_file_name() const {return file;}
   [[nodiscard]] Offset get_offset() const {return offset;}
   [[nodiscard]] Offset get_length() const {return length;}
   bool operator==(const DBPointer &rhs) const;
   bool operator!=(const DBPointer &rhs) const;
   friend std::ostream &operator<<(std::ostream &os, const DBPointer &pointer);
  private:
-  std::string file_name;
+  std::filesystem::path file;
   Offset offset;
   Offset length;
 };

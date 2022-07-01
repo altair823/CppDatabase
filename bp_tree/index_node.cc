@@ -27,7 +27,7 @@ BinaryUnique IndexNode::serialize() const {
   if (pointers.size() >= 4096){
     throw std::range_error("Too many childs(over 4096)!");
   }
-  int degree = pointers.size();
+  int degree = (int)pointers.size();
   std::vector<BinaryUnique> binaries;
   BinaryIndex total_size = 2;
   for (const auto &key: keys){
@@ -67,7 +67,7 @@ Result<BinaryIndex, DeserializeError> IndexNode::deserialize(const Binary &binar
   int degree = (binary.read_mem(0, Location_in_byte::SecondFourBit) << 4) + binary.read_mem(1);
   BinaryIndex index = 2;
   for (int i = 0; i < degree - 1; i++){
-    Key new_key = std::make_shared<Field>(schema->get_field(key_field_name).unwrap());
+    Key new_key = FieldFactory::create(schema->get_field(key_field_name).unwrap());
     index = new_key->deserialize(binary, index).unwrap();
     keys.push_back(new_key);
   }
@@ -116,4 +116,20 @@ void IndexNode::push_back_key(const Key &key) {
 }
 void IndexNode::push_back_pointer(const DBPointer &pointer) {
   pointers.push_back(pointer);
+}
+int IndexNode::search_key(const Key& key) {
+  int index = 0;
+  for (auto &k: keys){
+    if (*k > *key){
+      break;
+    }
+    index++;
+  }
+  return index;
+}
+void IndexNode::erase_key(int index) {
+
+}
+void IndexNode::erase_pointer(int index) {
+
 }
