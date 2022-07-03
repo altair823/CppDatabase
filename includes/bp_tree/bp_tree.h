@@ -15,7 +15,7 @@ class BPTree {
  public:
   explicit BPTree(SchemaShared schema, std::string key_field_name);
   bool is_empty();
-  bool insert(const Key& key, const Value& value, bool to_override);
+  bool insert(const Key& key, const Value& value, bool to_override = false);
   Result<Value, NotFound> search(Key key);
   Result<std::vector<Value>, NotFound> search(Key begin, Key end);
   bool remove(Key key);

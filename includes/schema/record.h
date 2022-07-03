@@ -19,11 +19,17 @@
 
 #include <error.h>
 
+class Record;
 
+using RecordShared = std::shared_ptr<Record>;
+
+class RecordFactory{
+ public:
+  static RecordShared create(SchemaShared schema);
+};
 
 class [[nodiscard]] Record : public Serializable{
  public:
-  explicit Record(SchemaShared schema);
 
   bool set_field(const TypeShared& data, const std::string& field_name);
   [[nodiscard]] Result<FieldShared, NotFound> get_field(const std::string& field_name) const;
@@ -32,15 +38,17 @@ class [[nodiscard]] Record : public Serializable{
   [[nodiscard]] BinaryUnique serialize() const override;
 
   friend std::ostream &operator<<(std::ostream &os, const Record &schema);
+  friend class RecordFactory;
   bool operator==(const Record &rhs) const;
 
+ private:
+  explicit Record(SchemaShared schema);
   SchemaShared schema;
   FieldShared pk;
-  std::set<FieldShared> fks;
-  std::set<FieldShared> other_fields;
+  std::vector<FieldShared> fks;
+  std::vector<FieldShared> other_fields;
 };
 
-typedef std::shared_ptr<Record> RecordShared;
 
 bool field_comparator(const FieldShared& fk1, const FieldShared& fk2);
 

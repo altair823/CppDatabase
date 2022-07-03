@@ -33,6 +33,10 @@ class FieldSchema{
   bool operator!=(const FieldSchema &rhs) const {return !(rhs == *this);}
 
   [[nodiscard]] TypeKind get_type() const {return type;}
+  bool operator<(const FieldSchema &rhs) const;
+  bool operator>(const FieldSchema &rhs) const;
+  bool operator<=(const FieldSchema &rhs) const;
+  bool operator>=(const FieldSchema &rhs) const;
   [[nodiscard]] std::string get_name() const {return name;}
 
  private:

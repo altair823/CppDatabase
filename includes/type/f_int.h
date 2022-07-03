@@ -16,7 +16,8 @@ class Int : public Type {
   [[nodiscard]] BinaryUnique serialize() const override;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
 
-  int32 get_int() const {return value;}
+  [[nodiscard]] int32 get_int() const {return value;}
+  [[nodiscard]] static int get_fixed_length() {return 32;}
  private:
   [[nodiscard]] bool eq(const Type &rhs) const override;
   [[nodiscard]] bool under(const Type &rhs) const override;

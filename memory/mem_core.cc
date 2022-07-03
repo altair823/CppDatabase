@@ -24,8 +24,8 @@ int write_str_size_bits(BinaryUnique &binary, int size, int byte_count) {
   return b_index_after_header;
 }
 
-std::vector<Byte> num_to_char_vec(unsigned long long int num){
-  unsigned long long int a = (unsigned long long int)1 << 56;
+std::vector<Byte> uint64_to_char_vec(std::uint64_t num){
+  std::uint64_t a = (std::uint64_t)1 << 56;
   std::vector<Byte> result;
   while (a > 0) {
     auto t = num / a;
@@ -35,6 +35,36 @@ std::vector<Byte> num_to_char_vec(unsigned long long int num){
   return result;
 }
 
+std::vector<Byte> uint32_to_char_vec(std::uint32_t num){
+  std::uint32_t a = (std::uint32_t)1 << 24;
+  std::vector<Byte> result;
+  while (a > 0) {
+    auto t = num / a;
+    result.push_back((char)t);
+    a = a >> 8;
+  }
+  return result;
+}
+std::vector<Byte> uint16_to_char_vec(std::uint16_t num){
+  std::uint16_t a = (std::uint16_t)1 << 8;
+  std::vector<Byte> result;
+  while (a > 0) {
+    auto t = num / a;
+    result.push_back((char)t);
+    a = a >> 8;
+  }
+  return result;
+}
+std::vector<Byte> uint8_to_char_vec(std::uint8_t num){
+  std::uint8_t a = 1;
+  std::vector<Byte> result;
+  while (a > 0) {
+    auto t = num / a;
+    result.push_back((char)t);
+    a = a >> 8;
+  }
+  return result;
+}
 unsigned long long byte_vec_to_num(std::vector<Byte> char_vec) {
   int start_index = -1;
   for (auto i = 0; i < (int)char_vec.size(); i++){
@@ -151,10 +181,21 @@ Byte Binary::read_mem(BinaryIndex index1, BinaryIndex index2) const {
 Result<Metadata, NotFound> Binary::save(const std::filesystem::path& file) {
   auto db_file = std::fstream(file, std::ios::binary | std::ios::app);
   if (db_file.fail()){
-    return Err(NotFound("Cannot found target file!"));
+    return Err(NotFound("Cannot open target file!"));
   }
   BinaryIndex offset = db_file.tellg();
   db_file.write((char *)this->data.get(), (long)this->length);
+  db_file.close();
+  return Ok(Metadata(offset, this->length));
+}
+Result<Metadata, NotFound> Binary::save(const std::filesystem::path &file, BinaryIndex offset) {
+  auto db_file = std::fstream(file, std::ios::binary | std::ios::in | std::ios::out);
+  if (db_file.fail()){
+    return Err(NotFound("Cannot open target file!"));
+  }
+  db_file.seekg(offset);
+  db_file.write((char *)this->data.get(), this->length);
+  db_file.close();
   return Ok(Metadata(offset, this->length));
 }
 BinaryUnique Binary::operator+(const Binary &binary_ref) const {

@@ -9,35 +9,58 @@
 
 BPTree::BPTree(SchemaShared schema, std::string key_field_name)
 : head(nullptr), schema(std::move(schema)), key_field_name(std::move(key_field_name)), current_file("db_file1.bin") {
+  if (!std::filesystem::exists(current_file)){
+    Int initial_offset(0);
+    Int initial_length(0);
+    auto initial_binary = initial_offset.serialize();
+    initial_binary = *initial_binary + *initial_length.serialize();
+    initial_binary->save(current_file).unwrap();
+  }
 }
 bool BPTree::insert(const Key& key, const Value& value, bool to_override) {
   if (this->is_empty()){
-    auto head_info_binary = BinaryFactory::read(current_file, 0, 32);
-    Int head_length;
-    head_length.deserialize(*head_info_binary, 0).unwrap();
-    auto head_binary = BinaryFactory::read(current_file, (long long)head_info_binary->get_length(), head_length.get_int());
     head = IndexNodeFactory::create(schema, key_field_name);
-    head->deserialize(*head_binary, 0).unwrap();
+    auto head_info_binary = BinaryFactory::read(current_file, 0, Int::get_fixed_length() * 2);
+    Int head_offset;
+    BinaryIndex head_index = head_offset.deserialize(*head_info_binary, 0).unwrap();
+    Int head_length;
+    head_length.deserialize(*head_info_binary, head_index).unwrap();
+    if (head_length.get_int() != 0) {
+      auto head_binary =
+          BinaryFactory::read(current_file, head_offset.get_int(), head_length.get_int());
+      head->deserialize(*head_binary, 0).unwrap();
+    }
 
     if (head->is_leaf() && head->get_pointer_count() == 0) {
       auto left_data = DataNodeFactory::create(schema, key_field_name);
-      auto left_binary = left_data->serialize();
-      auto metadata = left_binary->save(current_file).unwrap();
-      DBPointer left_pointer(current_file, metadata.offset, metadata.length);
+      auto left_metadata = left_data->serialize()->save(current_file).unwrap();
+      DBPointer left_pointer(current_file, left_metadata.offset, left_metadata.length);
       auto right_data = DataNodeFactory::create(schema, key_field_name);
-      auto right_binary = right_data->serialize();
+      auto right_metadata = right_data->serialize()->save(current_file).unwrap();
+      DBPointer right_pointer(current_file, right_metadata.offset, right_metadata.length);
       head->push_back_key(key);
-    //head->push_back_pointer()
+      head->push_back_pointer(left_pointer);
+      head->push_back_pointer(right_pointer);
+      auto head_metadata = head->serialize()->save(current_file).unwrap();
+      Int new_head_offset(head_metadata.offset);
+      Int new_head_length(head_metadata.length);
+      auto initial_binary = new_head_offset.serialize();
+      initial_binary = *initial_binary + * new_head_length.serialize();
+      initial_binary->save(current_file, 0).unwrap();
     }
 
     IndexNode *current = head.get();
-    while (current->is_leaf()){
+    while (!current->is_leaf()){
       int key_index = current->search_key(key);
       current = current->get_index_child(key_index).get();
     }
+    int index = current->search_key(key);
+    auto data_node = current->get_data_child(index);
+    int data_index = data_node->search(key);
+    data_node->insert(data_index, value);
 
-
-
+    // Split current data node when the number of data in the current data node exceeds the maximum.
+    // And save all data nodes in file.
   }
   return true;
 }

@@ -187,6 +187,7 @@ Result<SchemaBuilder*, AlreadyExist> SchemaBuilder::set_field(TypeKind type, con
         }
       }
       fks.emplace_back(type, name);
+      std::sort(fks.begin(), fks.end());
       return Ok(this);
     case KeyType::NONE:
       for (auto &field : other_fields) {
@@ -195,6 +196,7 @@ Result<SchemaBuilder*, AlreadyExist> SchemaBuilder::set_field(TypeKind type, con
         }
       }
       this->other_fields.emplace_back(type, name);
+      std::sort(other_fields.begin(), other_fields.end());
       return Ok(this);
   }
 }
@@ -209,4 +211,16 @@ Result<SchemaShared, NotFound> SchemaBuilder::build(){
   new_schema->other_fields.assign(other_fields.begin(), other_fields.end());
 
   return Ok(new_schema);
+}
+bool FieldSchema::operator<(const FieldSchema &rhs) const {
+  return name < rhs.name;
+}
+bool FieldSchema::operator>(const FieldSchema &rhs) const {
+  return rhs < *this;
+}
+bool FieldSchema::operator<=(const FieldSchema &rhs) const {
+  return !(rhs < *this);
+}
+bool FieldSchema::operator>=(const FieldSchema &rhs) const {
+  return !(*this < rhs);
 }

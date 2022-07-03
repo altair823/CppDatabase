@@ -16,7 +16,7 @@ TEST(TableTest, InsertTest){
 
   Table table(schema, std::make_shared<BPTree>(schema, "string1"));
 
-  auto record = std::make_unique<Record>(schema);
+  auto record = RecordFactory::create(schema);
   record->set_field(std::make_shared<String>("stringggg"), "string1");
   record->set_field(std::make_shared<DateTime>(20, 3, 14, 23, 25, 5), "datetime1");
   record->set_field(std::make_shared<DateTime>(12, 2, 23, 2, 35, 55), "datetime2");

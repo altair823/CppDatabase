@@ -70,7 +70,7 @@ Result<BinaryIndex, DeserializeError> DataNode::deserialize(const Binary &binary
   index = temp_str.deserialize(binary, index).unwrap();
   key_field_name = temp_str.get_string();
   for (int i = 0; i < data_count; i++){
-    auto new_data = std::make_shared<Record>(schema);
+    auto new_data = RecordFactory::create(schema);
     index = new_data->deserialize(binary, index).unwrap();
     data.push_back(std::move(new_data));
   }

@@ -14,7 +14,7 @@
 #include <ostream>
 #include "serializable.h"
 
-using Offset = long long int;
+using Offset_t = long long int;
 
 enum class NodeType {
   None, // 0
@@ -25,19 +25,19 @@ enum class NodeType {
 class DBPointer : public Serializable {
  public:
   DBPointer(): offset(0), length(0) {}
-  DBPointer(std::filesystem::path file, Offset offset, Offset length) : file(std::move(file)), offset(offset), length(length) {}
+  DBPointer(std::filesystem::path file, Offset_t offset, Offset_t length) : file(std::move(file)), offset(offset), length(length) {}
   [[nodiscard]] BinaryUnique serialize() const override;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
   [[nodiscard]] std::string get_file_name() const {return file;}
-  [[nodiscard]] Offset get_offset() const {return offset;}
-  [[nodiscard]] Offset get_length() const {return length;}
+  [[nodiscard]] Offset_t get_offset() const {return offset;}
+  [[nodiscard]] Offset_t get_length() const {return length;}
   bool operator==(const DBPointer &rhs) const;
   bool operator!=(const DBPointer &rhs) const;
   friend std::ostream &operator<<(std::ostream &os, const DBPointer &pointer);
  private:
   std::filesystem::path file;
-  Offset offset;
-  Offset length;
+  Offset_t offset;
+  Offset_t length;
 };
 
 NodeType byte_to_node_type(Byte byte);

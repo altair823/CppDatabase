@@ -7,14 +7,21 @@
 #include <utility>
 #include "type.h"
 
+RecordShared RecordFactory::create(SchemaShared schema) {
+  RecordShared new_record(new Record(std::move(schema)));
+  return new_record;
+}
+
 Record::Record(SchemaShared _schema) : schema(std::move(_schema)) {
   pk = FieldFactory::create(schema->get_pk());
   for (auto& fk: schema->get_fks()){
-    fks.insert(FieldFactory::create(fk));
+    fks.push_back(FieldFactory::create(fk));
   }
+  std::sort(fks.begin(), fks.end() , field_shared_comparator);
   for (auto& f: schema->get_other_fields()){
-    other_fields.insert(FieldFactory::create(f));
+    other_fields.push_back(FieldFactory::create(f));
   }
+  std::sort(other_fields.begin(), other_fields.end(), field_shared_comparator);
 }
 
 bool Record::set_field(const TypeShared& data, const std::string& field_name) {

@@ -21,7 +21,7 @@ Result<BinaryIndex, DeserializeError> DBPointer::deserialize(const Binary &binar
     valid_offset_bytes.push_back(binary.read_mem(index));
     index++;
   }
-  this->offset = (Offset)byte_vec_to_num(valid_offset_bytes);
+  this->offset = (Offset_t)byte_vec_to_num(valid_offset_bytes);
 
   auto length_byte_count = binary.read_mem(index);
   index++;
@@ -30,7 +30,7 @@ Result<BinaryIndex, DeserializeError> DBPointer::deserialize(const Binary &binar
     valid_length_bytes.push_back(binary.read_mem(index));
     index++;
   }
-  this->length = (Offset) byte_vec_to_num(valid_length_bytes);
+  this->length = (Offset_t) byte_vec_to_num(valid_length_bytes);
   return Ok(index);
 }
 BinaryUnique DBPointer::serialize() const {
@@ -38,7 +38,7 @@ BinaryUnique DBPointer::serialize() const {
   if (file_name_byte_count > 225){
     throw SerializeError("Too long file name!");
   }
-  auto offset_to_chars = num_to_char_vec(offset);
+  auto offset_to_chars = uint64_to_char_vec(offset);
   bool flag = false;
   std::vector<Byte> valid_offset_bytes;
   for (auto &f: offset_to_chars){
@@ -51,7 +51,7 @@ BinaryUnique DBPointer::serialize() const {
     throw SerializeError("File is too large!");
   }
   auto offset_byte_count = (Byte)valid_offset_bytes.size();
-  auto length_to_chars = num_to_char_vec(length);
+  auto length_to_chars = uint64_to_char_vec(length);
   flag = false;
   std::vector<Byte> valid_length_bytes;
   for (auto &l: length_to_chars){

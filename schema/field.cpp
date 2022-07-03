@@ -23,10 +23,7 @@ bool Field::operator!=(const Field &rhs) const {
   return !(rhs == *this);
 }
 bool Field::operator<(const Field &rhs) const {
-  if (name != rhs.name){
-    throw CannotConvert("Wrong field comparing!");
-  }
-  if (data < rhs.data) {
+  if (name < rhs.name) {
     return true;
   } else {
     return false;
@@ -76,4 +73,8 @@ FieldShared FieldFactory::create(std::string name) {
 FieldShared FieldFactory::create(std::string name, TypeShared data) {
   std::shared_ptr<Field> new_field(new Field(std::move(name), std::move(data)));
   return new_field;
+}
+
+bool field_shared_comparator(const FieldShared& field1, const FieldShared& field2){
+  return *field1 > *field2;
 }

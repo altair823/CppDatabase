@@ -58,6 +58,7 @@ class [[nodiscard]] Binary{
   [[nodiscard]] Byte read_mem(BinaryIndex index1, BinaryIndex index2) const;
 
   Result<Metadata, NotFound> save(const std::filesystem::path& file);
+  Result<Metadata, NotFound> save(const std::filesystem::path& file, BinaryIndex offset);
 
   BinaryUnique operator+(const Binary& binary_ref) const;
   friend std::ostream &operator<<(std::ostream &os, const Binary &binary);
@@ -74,7 +75,10 @@ class [[nodiscard]] Binary{
 };
 
 int get_byte_count(unsigned long long size);
-std::vector<Byte> num_to_char_vec(unsigned long long int num);
+std::vector<Byte> uint64_to_char_vec(std::uint64_t num);
+std::vector<Byte> uint32_to_char_vec(std::uint32_t num);
+std::vector<Byte> uint16_to_char_vec(std::uint16_t num);
+std::vector<Byte> uint8_to_char_vec(std::uint8_t num);
 unsigned long long byte_vec_to_num(std::vector<Byte> char_vec);
 int write_str_size_bits(BinaryUnique &binary, int size, int byte_count);
 

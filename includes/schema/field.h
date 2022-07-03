@@ -52,5 +52,6 @@ class [[nodiscard]] Field : public Serializable{
   std::string name;
 };
 
+bool field_shared_comparator(const FieldShared& field1, const FieldShared& field2);
 
 #endif //CPPDATABASE_INCLUDES_SCHEMA_FIELD_H_

@@ -34,10 +34,10 @@ TEST(DataNodeTest, SerializeTest){
       ->set_field(TypeKind::DATETIME, "Created date").unwrap()
       ->build().unwrap();
 
-  auto data1 = std::make_unique<Record>(schema);
-  auto data2 = std::make_unique<Record>(schema);
-  auto data3 = std::make_unique<Record>(schema);
-  auto data4 = std::make_unique<Record>(schema);
+  auto data1 = RecordFactory::create(schema);
+  auto data2 = RecordFactory::create(schema);
+  auto data3 = RecordFactory::create(schema);
+  auto data4 = RecordFactory::create(schema);
   auto data_node = DataNodeFactory::create(schema, "pk_str");
   data_node->push_back(std::move(data1));
   data_node->push_back(std::move(data2));
