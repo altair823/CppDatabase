@@ -71,7 +71,7 @@ TEST(IndexNodeTest, DataChildTest){
   auto data2 = RecordFactory::create(schema);
   auto data3 = RecordFactory::create(schema);
   auto data4 = RecordFactory::create(schema);
-  auto data_node = DataNodeFactory::create(schema, "pk_str");
+  auto data_node = DataNodeFactory::create(schema, "pk_str", "");
   data_node->push_back(std::move(data1));
   data_node->push_back(std::move(data2));
   data_node->push_back(std::move(data3));

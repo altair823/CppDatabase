@@ -13,6 +13,7 @@ class Serializable {
  public:
   [[nodiscard]] virtual BinaryUnique serialize() const = 0;
   virtual Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) = 0;
+  virtual Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary) {return deserialize(binary, 0);};
   void _can_serialize() {};
   void _can_deserialize() {};
 };

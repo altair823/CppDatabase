@@ -7,21 +7,35 @@
 #include <utility>
 
 
-DataNodeShared DataNodeFactory::create(const SchemaShared& schema, std::string key_field_name) {
-  DataNodeShared new_data_node(new DataNode(schema, std::move(key_field_name)));
+DataNodeShared DataNodeFactory::create(const SchemaShared& schema, std::string key_field_name, std::filesystem::path record_file) {
+  DataNodeShared new_data_node(new DataNode(schema, std::move(key_field_name), std::move(record_file)));
   return new_data_node;
 }
+DataNode::DataNode(SchemaShared schema, std::string key_field_name, std::filesystem::path record_file)
+: schema(std::move(schema)), key_field_name(std::move(key_field_name)), record_file(DBFile(std::move(record_file), TWO_GB)) {
+
+}
+Value DataNode::get_value(int index) const {
+  auto value_binary = BinaryFactory::read(data[index].get_file_name(), data[index].get_offset(), data[index].get_length());
+  auto value = RecordFactory::create(schema);
+  value->Serializable::deserialize(*value_binary).unwrap();
+  return value;
+}
 void DataNode::insert(int index, Value new_data) {
-  data.insert(data.begin() + index, std::move(new_data));
+  auto record_filename = record_file.get_free_file();
+  auto metadata = new_data->serialize()->save(record_filename).unwrap();
+  data.insert(data.begin() + index, DBPointer(record_filename, metadata.offset, metadata.length));
 }
 void DataNode::push_back(Value new_data) {
-  data.push_back(std::move(new_data));
+  auto record_filename = record_file.get_free_file();
+  auto metadata = new_data->serialize()->save(record_filename).unwrap();
+  data.emplace_back(record_filename, metadata.offset, metadata.length);
 }
 int DataNode::search(const Key& key) const {
-  auto iterator = std::lower_bound(data.begin(), data.end(), key, [&](const Value &data_it, const Key &key){
-    return data_it->get_field(key_field_name).unwrap() < key;
+  auto iterator = std::lower_bound(keys.begin(), keys.end(), key, [&](const Key &key_it, const Key &key){
+    return key_it < key;
   });
-  return (int)std::distance(data.begin(), iterator);
+  return (int)std::distance(keys.begin(), iterator);
 }
 void DataNode::remove(int index) {
   data.erase(data.begin() + index);
@@ -39,7 +53,7 @@ BinaryUnique DataNode::serialize() const {
   binaries.push_back(std::move(key_binary));
 
   for (const auto &d: data){
-    binaries.push_back(d->serialize());
+    binaries.push_back(d.serialize());
     total_size += binaries.back()->get_length();
   }
 
@@ -70,8 +84,8 @@ Result<BinaryIndex, DeserializeError> DataNode::deserialize(const Binary &binary
   index = temp_str.deserialize(binary, index).unwrap();
   key_field_name = temp_str.get_string();
   for (int i = 0; i < data_count; i++){
-    auto new_data = RecordFactory::create(schema);
-    index = new_data->deserialize(binary, index).unwrap();
+    auto new_data = DBPointer();
+    index = new_data.deserialize(binary, index).unwrap();
     data.push_back(std::move(new_data));
   }
   return Ok(index);
@@ -81,7 +95,7 @@ bool DataNode::operator==(const DataNode &rhs) const {
     return false;
   } else {
     for (int i = 0; i < data.size(); i++){
-      if (*data[i] != *rhs.data[i]){
+      if (data[i] != rhs.data[i]){
         return false;
       }
     }

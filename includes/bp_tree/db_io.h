@@ -40,6 +40,21 @@ class DBPointer : public Serializable {
   Offset_t length;
 };
 
+class DBFile : public Serializable {
+ public:
+  DBFile(std::filesystem::path  file, uintmax_t threshold_file_size);
+  std::filesystem::path get_free_file();
+  friend std::ostream &operator<<(std::ostream &os, const DBFile &file);
+  [[nodiscard]] BinaryUnique serialize() const override;
+  Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
+ private:
+  std::filesystem::path add_index_to_filename(const std::filesystem::path& file, unsigned int idx);
+  std::filesystem::path original_file;
+  std::filesystem::path current_file;
+  unsigned int index;
+  uintmax_t threshold_file_size;
+};
+
 NodeType byte_to_node_type(Byte byte);
 
 #endif //CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DB_IO_H_

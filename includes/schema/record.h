@@ -36,7 +36,6 @@ class [[nodiscard]] Record : public Serializable{
   [[nodiscard]] Result<FieldShared, NotFound> get_pk_field() const;
   Result<BinaryIndex, DeserializeError> deserialize(const Binary &binary, BinaryIndex begin) override;
   [[nodiscard]] BinaryUnique serialize() const override;
-
   friend std::ostream &operator<<(std::ostream &os, const Record &schema);
   friend class RecordFactory;
   bool operator==(const Record &rhs) const;

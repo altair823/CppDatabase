@@ -23,7 +23,8 @@ class BPTree {
   IndexNodeUnique head;
   SchemaShared schema;
   std::string key_field_name;
-  std::filesystem::path current_file;
+  std::filesystem::path db_file;
+  std::filesystem::path record_file;
 };
 
 using BPTreeShared = std::shared_ptr<BPTree>;

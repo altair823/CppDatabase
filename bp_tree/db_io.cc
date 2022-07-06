@@ -3,6 +3,8 @@
 //
 #include "db_io.h"
 
+#include <utility>
+
 Result<BinaryIndex, DeserializeError> DBPointer::deserialize(const Binary &binary, BinaryIndex start_index) {
   BinaryIndex index = start_index;
   auto file_name_byte_count = binary.read_mem(index);
@@ -104,3 +106,29 @@ NodeType byte_to_node_type(Byte byte) {
   return static_cast<NodeType>(byte);
 }
 
+DBFile::DBFile(std::filesystem::path  file, uintmax_t threshold_file_size): original_file(std::move(file)), index(0), threshold_file_size(threshold_file_size) {
+  current_file = add_index_to_filename(original_file, index);
+}
+std::filesystem::path DBFile::get_free_file() {
+  while (exists(current_file) && file_size(current_file) > threshold_file_size){
+    index++;
+    current_file = add_index_to_filename(original_file, index);
+  }
+  return current_file;
+}
+std::filesystem::path DBFile::add_index_to_filename(const std::filesystem::path& file, unsigned int idx) {
+    auto new_stem = original_file.stem().string() + std::to_string(idx);
+    auto extension = original_file.extension();
+    return original_file.parent_path() / std::filesystem::path(new_stem + extension.string());
+}
+std::ostream &operator<<(std::ostream &os, const DBFile &file) {
+  os << "original_file: " << file.original_file << " current_file: " << file.current_file << " index: " << file.index
+     << " threshold_file_size: " << file.threshold_file_size;
+  return os;
+}
+BinaryUnique DBFile::serialize() const {
+  return BinaryUnique();
+}
+Result<BinaryIndex, DeserializeError> DBFile::deserialize(const Binary &binary, BinaryIndex begin) {
+  return Result<BinaryIndex, DeserializeError>(types::Ok());
+}

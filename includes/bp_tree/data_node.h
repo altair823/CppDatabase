@@ -26,13 +26,13 @@ using DataNodeShared = std::shared_ptr<DataNode>;
 
 class DataNodeFactory {
  public:
-  static DataNodeShared create(const SchemaShared& schema, std::string key_field_name);
+  static DataNodeShared create(const SchemaShared& schema, std::string key_field_name, std::filesystem::path record_file);
 };
 
 class DataNode : public Serializable{
  public:
-  [[nodiscard]] Key get_key(int index) const {return data[index]->get_field(key_field_name).unwrap();}
-  [[nodiscard]] Value get_value(int index) const {return data[index];}
+  [[nodiscard]] Key get_key(int index) const {return keys[index];}
+  [[nodiscard]] Value get_value(int index) const;
   void remove(int index);
   [[nodiscard]] int get_data_count() const {return (int)data.size();}
 
@@ -55,18 +55,23 @@ class DataNode : public Serializable{
   bool operator!=(const DataNode &rhs) const;
   friend std::ostream &operator<<(std::ostream &os, const DataNode &node) {
     os << "DataNode{\nleft: " << node.left << ",\nright: " << node.right << ",\ndata: ";
+    for (auto& k: node.keys){
+      os << "\n" << k;
+    }
     for (auto& d: node.data){
-      os << "\n" << *d;
+      os << "\n" << d;
     }
     return os;
   }
  private:
   friend class DataNodeFactory;
-  explicit DataNode(SchemaShared schema, std::string key_field_name) : schema(std::move(schema)), key_field_name(std::move(key_field_name)) {}
+  DataNode(SchemaShared schema, std::string key_field_name, std::filesystem::path record_file);
 
   SchemaShared schema;
   DBPointer left, right;
-  std::vector<Value> data;
+  std::vector<Key> keys;
+  std::vector<DBPointer> data;
   std::string key_field_name;
+  DBFile record_file;
 };
 #endif //CPPDATABASE_INCLUDES_STORAGE_BP_TREE_DATA_NODE_H_

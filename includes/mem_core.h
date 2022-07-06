@@ -23,6 +23,8 @@ using int16 = std::int16_t; // short
 using int32 = std::int32_t; // int
 using int64 = std::int64_t; // long
 
+constexpr unsigned int TWO_GB = 2147483648;
+
 enum class Location_in_byte {
   FirstFourBit,
   SecondFourBit,

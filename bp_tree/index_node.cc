@@ -101,9 +101,9 @@ DataNodeShared IndexNode::get_data_child(int index) const {
     throw NotFound("The Node is not leaf! Does not have any data nodes.");
   }
   auto binary = BinaryFactory::read(pointers[index].get_file_name(), pointers[index].get_offset(), pointers[index].get_length());
-  auto new_data_node = DataNodeFactory::create(schema, key_field_name);
-  new_data_node->deserialize(*binary, 0).unwrap();
-  return new_data_node;
+//  auto new_data_node = DataNodeFactory::create(schema, key_field_name, );
+//  new_data_node->deserialize(*binary, 0).unwrap();
+//  return new_data_node;
 }
 void IndexNode::insert_key(int index, const Key& key) {
   keys.insert(keys.begin() + index, key);
