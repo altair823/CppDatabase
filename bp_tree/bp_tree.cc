@@ -1,7 +1,3 @@
-//
-// Created by 김태현 on 2022/06/16.
-//
-
 #include <bp_tree.h>
 
 #include <utility>
@@ -53,7 +49,7 @@ bool BPTree::insert(const Key& key, const Value& value, bool to_override) {
       current = current->get_index_child(key_index).get();
     }
     int index = current->search_key(key);
-    auto data_node = current->get_data_child(index);
+    auto data_node = current->get_data_child(index, record_file);
     int data_index = data_node->search(key);
     data_node->insert(data_index, value);
 

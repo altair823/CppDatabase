@@ -7,7 +7,7 @@
 
 BinaryUnique DateTime::serialize() const {
   auto result = BinaryFactory::create(6);
-  result->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_byte(field_type));
+  result->set_mem(0, Location_in_byte::FirstFourBit, type_to_byte(field_type));
   result->set_mem(0, 1, f_year);
   result->set_mem(1, Location_in_byte::SecondFourBit, f_month);
   result->set_mem(2, f_day);

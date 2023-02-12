@@ -1,6 +1,3 @@
-//
-// Created by 김태현 on 2022/06/15.
-//
 #include <index_node.h>
 
 #include <utility>
@@ -96,14 +93,14 @@ IndexNodeUnique IndexNode::get_index_child(int index) const {
   new_index_node->deserialize(*binary, 0).unwrap();
   return new_index_node;
 }
-DataNodeShared IndexNode::get_data_child(int index) const {
+DataNodeShared IndexNode::get_data_child(int index, std::filesystem::path record_file) const {
   if (!is_node_leaf){
     throw NotFound("The Node is not leaf! Does not have any data nodes.");
   }
   auto binary = BinaryFactory::read(pointers[index].get_file_name(), pointers[index].get_offset(), pointers[index].get_length());
-//  auto new_data_node = DataNodeFactory::create(schema, key_field_name, );
-//  new_data_node->deserialize(*binary, 0).unwrap();
-//  return new_data_node;
+  auto new_data_node = DataNodeFactory::create(schema, key_field_name, std::move(record_file));
+  new_data_node->deserialize(*binary, 0).unwrap();
+  return new_data_node;
 }
 void IndexNode::insert_key(int index, const Key& key) {
   keys.insert(keys.begin() + index, key);

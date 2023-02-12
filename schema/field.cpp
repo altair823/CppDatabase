@@ -70,8 +70,8 @@ FieldShared FieldFactory::create(std::string name) {
   std::shared_ptr<Field> new_field(new Field(std::move(name)));
   return new_field;
 }
-FieldShared FieldFactory::create(std::string name, TypeShared data) {
-  std::shared_ptr<Field> new_field(new Field(std::move(name), std::move(data)));
+FieldShared FieldFactory::create(std::string name, TypeShared type) {
+  std::shared_ptr<Field> new_field(new Field(std::move(name), std::move(type)));
   return new_field;
 }
 

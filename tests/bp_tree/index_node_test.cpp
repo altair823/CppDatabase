@@ -61,6 +61,7 @@ TEST(IndexNodeTest, IndexChildTest){
 
 TEST(IndexNodeTest, DataChildTest){
   auto test_filename = "data_node_db_test";
+  auto test_data_node_filename = "test_data_node_file.bin";
 
   auto schema = SchemaBuilder("test schema").set_field(TypeKind::STRING, "pk_str", KeyType::PK).unwrap()
       ->set_field(TypeKind::STRING, "fk_str", KeyType::FK).unwrap()
@@ -71,7 +72,7 @@ TEST(IndexNodeTest, DataChildTest){
   auto data2 = RecordFactory::create(schema);
   auto data3 = RecordFactory::create(schema);
   auto data4 = RecordFactory::create(schema);
-  auto data_node = DataNodeFactory::create(schema, "pk_str", "");
+  auto data_node = DataNodeFactory::create(schema, "pk_str", test_data_node_filename);
   data_node->push_back(std::move(data1));
   data_node->push_back(std::move(data2));
   data_node->push_back(std::move(data3));
@@ -85,7 +86,7 @@ TEST(IndexNodeTest, DataChildTest){
   parent_node->set_leaf(LEAF);
   parent_node->push_back_pointer(db_pointer);
 
-  auto read_node = parent_node->get_data_child(0);
+  auto read_node = parent_node->get_data_child(0, test_data_node_filename);
   ASSERT_EQ(*data_node, *read_node);
   //std::cout << *parent_node << std::endl << *data_node << std::endl << *read_node;
 }

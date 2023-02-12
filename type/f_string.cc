@@ -16,7 +16,7 @@ BinaryUnique String::serialize() const {
     throw SerializeError("Too long string!");
   }
   auto binary = BinaryFactory::create(str.size() + 1 + byte_count);
-  binary->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_byte(TypeKind::STRING));
+  binary->set_mem(0, Location_in_byte::FirstFourBit, type_to_byte(TypeKind::STRING));
   binary->set_mem(0, Location_in_byte::SecondFourBit, byte_count);
 
   BinaryIndex b_index = 1;

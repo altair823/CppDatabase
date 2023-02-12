@@ -5,3 +5,5 @@
 /cmake-build-debug/
 /upload_pi.sh
 /rsync_exclude.txt
+.DS_Store
+/.idea

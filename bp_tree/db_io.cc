@@ -1,6 +1,3 @@
-//
-// Created by 김태현 on 2022/05/28.
-//
 #include "db_io.h"
 
 #include <utility>
@@ -125,10 +122,4 @@ std::ostream &operator<<(std::ostream &os, const DBFile &file) {
   os << "original_file: " << file.original_file << " current_file: " << file.current_file << " index: " << file.index
      << " threshold_file_size: " << file.threshold_file_size;
   return os;
-}
-BinaryUnique DBFile::serialize() const {
-  return BinaryUnique();
-}
-Result<BinaryIndex, DeserializeError> DBFile::deserialize(const Binary &binary, BinaryIndex begin) {
-  return Result<BinaryIndex, DeserializeError>(types::Ok());
 }

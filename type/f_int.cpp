@@ -7,7 +7,7 @@
 BinaryUnique Int::serialize() const {
   auto int_byte_vec = uint32_to_char_vec(value);
   auto binary_unique = BinaryFactory::create(5);
-  binary_unique->set_mem(0, Location_in_byte::FirstFourBit, type_to_4_byte(TypeKind::INT));
+  binary_unique->set_mem(0, Location_in_byte::FirstFourBit, type_to_byte(TypeKind::INT));
   int index = 1;
   for (auto &i: int_byte_vec){
     binary_unique->set_mem(index, i);

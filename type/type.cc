@@ -30,7 +30,7 @@ bool Type::operator<=(const Type &rhs) const {
 bool Type::operator>=(const Type &rhs) const {
   return !(*this < rhs);
 }
-Byte type_to_4_byte(TypeKind type) {
+Byte type_to_byte(TypeKind type) {
   switch (type) {
     case TypeKind::NONE:return 0;
     case TypeKind::STRING:return 1;
@@ -48,8 +48,8 @@ Byte type_to_4_byte(TypeKind type) {
   }
   return 0;
 }
-TypeKind byte_to_type(Byte bits) {
-  return static_cast<TypeKind>(bits);
+TypeKind byte_to_type(Byte byte) {
+  return static_cast<TypeKind>(byte);
 }
 std::ostream &operator<<(std::ostream &os, const TypeKind &type) {
   switch (type) {

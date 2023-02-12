@@ -5,23 +5,13 @@
 
 
 
-int get_byte_count(unsigned long long size) {
+int get_byte_count(unsigned long long integer) {
   int i = 0;
-  while (size > 0) {
-    size = size >> 8;
+  while (integer > 0) {
+    integer = integer >> 8;
     i++;
   }
   return i;
-}
-
-int write_str_size_bits(BinaryUnique &binary, int size, int byte_count) {
-  int b_index_after_header = 1;
-  for (auto i = 0; i < byte_count; i++) {
-    int data = size >> ((byte_count - (i + 1)) * 8);
-    binary->set_mem(b_index_after_header, (char) data);
-    b_index_after_header++;
-  }
-  return b_index_after_header;
 }
 
 std::vector<Byte> uint64_to_char_vec(std::uint64_t num){
@@ -87,8 +77,8 @@ BinaryUnique BinaryFactory::create(BinaryIndex length) {
   std::unique_ptr<Binary> binary(new Binary(length));
   return binary;
 }
-BinaryUnique BinaryFactory::create(std::unique_ptr<Byte[]> byte_buffer, BinaryIndex length) {
-  std::unique_ptr<Binary> binary(new Binary(std::move(byte_buffer), length));
+BinaryUnique BinaryFactory::create(std::unique_ptr<Byte[]> binary_data, BinaryIndex length) {
+  std::unique_ptr<Binary> binary(new Binary(std::move(binary_data), length));
   return binary;
 }
 BinaryUnique BinaryFactory::read(const std::filesystem::path& file, BinaryIndex offset, BinaryIndex length) {
@@ -109,11 +99,11 @@ Binary::Binary(BinaryIndex length): length(length) {
     data = std::make_unique<Byte[]>(length);
   }
 }
-Binary::Binary(std::unique_ptr<Byte[]> byte_buffer, BinaryIndex length): length(length) {
+Binary::Binary(std::unique_ptr<Byte[]> binary_data, BinaryIndex length): length(length) {
   if (length == 0){
     data = nullptr;
   } else {
-    data = std::move(byte_buffer);
+    data = std::move(binary_data);
   }
 }
 void Binary::set_mem(BinaryIndex index, Location_in_byte loc, const Byte &value) {
